@@ -1,13 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
-
-
 // Obtain posts
 const fetchPosts = async () => {
   try {
     console.log("Comenzando petición");
-    const response = await axios.get("http://localhost:3000/post");
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/post`);
     console.log(response.data);
     return response.data;
   } catch (error) {
@@ -27,7 +25,9 @@ export const usePosts = () => {
 const fetchPaginatedPosts = async (page = 1) => {
   try {
     console.log("Comenzando petición");
-    const response = await axios.get(`http://localhost:3000/post?page=${page}`);
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/post?page=${page}`
+    );
     console.log(response.data);
     return response.data;
   } catch (error) {
@@ -48,12 +48,12 @@ export const usePaginatedPosts = (page = 1) => {
 
 const createPosts = async (body) => {
   try {
-    console.log(body);
     const response = await axios.post(
-      "http://localhost:3000/post/create",
+      `${import.meta.env.VITE_API_URL}/post/create`,
       body,
       { withCredentials: true }
     );
+
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -73,7 +73,6 @@ export const useCreatePosts = () => {
     mutationFn: createPosts,
     onSuccess: (data) => {
       console.log("Post creado exitosamente", data);
-      
     },
     onError: (error) => {
       console.error("Error al crear el post", error);
@@ -110,7 +109,6 @@ export const useEditPost = () => {
     mutationFn: editPosts,
     onSuccess: (data) => {
       console.log("Post editado exitosamente", data);
-
     },
     onError: (error) => {
       console.error("Error al editar el post", error);
@@ -121,9 +119,9 @@ export const useEditPost = () => {
 // Obtain posts by id
 const fetchPostById = async (id) => {
   try {
-    console.log("ID enviado:", id);
-    const response = await axios.get(`http://localhost:3000/post/${id}`);
-    console.log(response.data.post);
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/post/${id}`
+    );
     return response.data.post;
   } catch (error) {
     if (error.response) {
@@ -148,12 +146,11 @@ export const usePostById = (id) => {
 // Delete posts
 const deletePost = async (id) => {
   try {
-    console.log("ID que se envía al backend:", id); // Verificar el id
     const response = await axios.delete(
-      `http://localhost:3000/post/delete/${id}`,
+      `${import.meta.env.VITE_API_URL}/post/delete/${id}`,
       { withCredentials: true }
     );
-    console.log(response.data.post);
+
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -186,11 +183,9 @@ export const useDeletePost = () => {
 const insertComment = async (body) => {
   try {
     const response = await axios.post(
-      "http://localhost:3000/comments/create",
+      `${import.meta.env.VITE_API_URL}/comments/create`,
       body
     );
-
-    console.log(response.data);
 
     return response;
   } catch (error) {
