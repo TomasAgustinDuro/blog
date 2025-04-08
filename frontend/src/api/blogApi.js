@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
+
+
 // Obtain posts
 const fetchPosts = async () => {
   try {
@@ -17,6 +19,27 @@ export const usePosts = () => {
   return useQuery({
     queryKey: ["post"],
     queryFn: fetchPosts,
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+// Obtain posts
+const fetchPaginatedPosts = async (page = 1) => {
+  try {
+    console.log("Comenzando petición");
+    const response = await axios.get(`http://localhost:3000/post?page=${page}`);
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    throw new Error("Error al obtener los posts: " + error.message);
+  }
+};
+
+export const usePaginatedPosts = (page = 1) => {
+  return useQuery({
+    queryKey: ["post", page],
+    queryFn: () => fetchPaginatedPosts(page),
+    keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
   });
 };
@@ -50,6 +73,7 @@ export const useCreatePosts = () => {
     mutationFn: createPosts,
     onSuccess: (data) => {
       console.log("Post creado exitosamente", data);
+      
     },
     onError: (error) => {
       console.error("Error al crear el post", error);
@@ -59,8 +83,8 @@ export const useCreatePosts = () => {
 
 // Edit posts
 const editPosts = async (body) => {
-  console.log(body.id.id);
-  const id = body.id.id;
+  console.log("editpost", body.id);
+  const id = body.id;
   try {
     const response = await axios.put(
       `http://localhost:3000/post/edit/${id}`,
@@ -86,6 +110,7 @@ export const useEditPost = () => {
     mutationFn: editPosts,
     onSuccess: (data) => {
       console.log("Post editado exitosamente", data);
+
     },
     onError: (error) => {
       console.error("Error al editar el post", error);
@@ -125,7 +150,8 @@ const deletePost = async (id) => {
   try {
     console.log("ID que se envía al backend:", id); // Verificar el id
     const response = await axios.delete(
-      `http://localhost:3000/post/delete/${id}`, { withCredentials: true }
+      `http://localhost:3000/post/delete/${id}`,
+      { withCredentials: true }
     );
     console.log(response.data.post);
     return response.data;

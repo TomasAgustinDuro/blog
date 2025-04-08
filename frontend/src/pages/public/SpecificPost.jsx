@@ -14,7 +14,6 @@ function SpecificPost() {
 
   return (
     <div className={styles.container}>
-      <Navbar />
       <div className={styles.card}>
         <h3 className={styles.title}>{post.title}</h3>
         <p className={styles.content}>{post.content}</p>

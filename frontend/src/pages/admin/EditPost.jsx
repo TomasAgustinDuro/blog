@@ -1,16 +1,19 @@
 import { useState, useEffect } from "react";
 import { usePostById, useEditPost } from "../../api/blogApi";
 import { useParams } from "react-router";
+import styles from "./editPost.module.css";
+import { useNavigate } from "react-router";
 
 function EditPost() {
-  const id = useParams();
+  const { id } = useParams();
   const { data: post } = usePostById(id);
+  const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState("");
-  const { mutate, isLoading } = useEditPost();
+  const { mutate, isLoading, isSuccess, isError, error, data } = useEditPost();
 
   // Manejar el envío del formulario
   const handleSubmit = (e) => {
@@ -29,7 +32,16 @@ function EditPost() {
   };
 
   useEffect(() => {
-    console.log(post);
+    if (isSuccess) {
+      const timeout = setTimeout(() => {
+        navigate("/admin/post"); 
+      }, 2000); 
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isSuccess, navigate]);
+
+  useEffect(() => {
     if (post) {
       setTitle(post.title);
       setContent(post.content);
@@ -41,10 +53,8 @@ function EditPost() {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
-  console.log(tags);
-
   return (
-    <div>
+    <div className={styles.editContainer}>
       <h2>Editar</h2>
       <form onSubmit={handleSubmit}>
         <input
@@ -58,11 +68,13 @@ function EditPost() {
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
-        <div>
+        <div className={styles.tagList}>
           {tags.map((tag, index) => (
-            <div>
-              <p key={index}>{tag}</p>
-              <button onClick={() => handleRemoveTag(tag)}>X</button>
+            <div key={index} className={styles.tagItem}>
+              <p>{tag}</p>
+              <button type="button" onClick={() => handleRemoveTag(tag)}>
+                X
+              </button>
             </div>
           ))}
         </div>
@@ -72,11 +84,22 @@ function EditPost() {
           value={currentTag}
           onChange={(e) => setCurrentTag(e.target.value)}
         />
-        <button onClick={handleAddTag}>Add Tag</button>
-        <button disabled={isLoading}>
-          {isLoading ? "Submitting..." : "Edit Post"}
-        </button>
+        <div className={styles.buttonGroup}>
+          <button type="button" onClick={handleAddTag}>
+            Add Tag
+          </button>
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "Submitting..." : "Edit Post"}
+          </button>
+        </div>
       </form>
+
+      {isError && <div className={styles.error}>Error: {error.message}</div>}
+      {isSuccess && (
+        <div className={styles.success}>
+          {data?.message || "Post editado exitosamente"}
+        </div>
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import PublicPosts from "../src/pages/public/PublicPosts";
 import Home from "../src/pages/public/Home";
 import AboutMe from "../src/pages/public/aboutMe";
 import SpecificPost from "../src/pages/public/SpecificPost";
+import Admin from "../src/pages/admin/Admin";
 
 const AppRoutes = () => {
   return (
@@ -16,39 +17,34 @@ const AppRoutes = () => {
       <Route path="/about-me" element={<AboutMe />} />
       <Route path="/post" element={<PublicPosts />} />
       <Route path="/post/:id" element={<SpecificPost />} />
-      <Route
-        path="/edit/:id"
-        element={
-          <ProtectedRoutes>
-            <EditPost />
-          </ProtectedRoutes>
-        }
-      />
-      <Route
-        path="admin/post"
-        element={
-          <ProtectedRoutes>
-            <Posts />
-          </ProtectedRoutes>
-        }
-      />
-      <Route
-        path="/edit/:id"
-        element={
-          <ProtectedRoutes>
-            <Posts />
-          </ProtectedRoutes>
-        }
-      />
 
-      <Route
-        path="/create"
-        element={
-          <ProtectedRoutes>
-            <CreatePostForm />
-          </ProtectedRoutes>
-        }
-      />
+      <Route path="/admin" element={<Admin />}>
+        <Route
+          path="create"
+          element={
+            <ProtectedRoutes>
+              <CreatePostForm />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="edit/:id"
+          element={
+            <ProtectedRoutes>
+              <EditPost/>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="post"
+          element={
+            <ProtectedRoutes>
+              <Posts />
+            </ProtectedRoutes>
+          }
+        />
+      </Route>
+
       <Route path="/login" element={<Login />} />
     </Routes>
   );

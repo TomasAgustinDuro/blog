@@ -1,0 +1,20 @@
+.postContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.postCard {
+  outline: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  padding: 1em;
+  width: 75%;
+  margin: auto;
+}
+
+.postCard:hover {
+  /* un poco más de sombra y elevación al hacer hover */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}

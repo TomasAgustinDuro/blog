@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCreatePosts } from "../../api/blogApi";
+import styles from "./insertPost.module.css";
+import { useNavigate } from "react-router";
+
 
 function CreatePostForm() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState("");
+  const navigate = useNavigate()
 
- 
-  const { mutate, isLoading, onError, onSuccess } = useCreatePosts();
+  const { mutate, isLoading, isSuccess, isError, error } = useCreatePosts();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,11 +19,19 @@ function CreatePostForm() {
     // Creamos el nuevo post
     const newPost = { title, content, tags };
 
-    console.log("Enviando post: ", newPost);
-
     // Ejecutamos la mutación con el post
     mutate(newPost);
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      const timeout = setTimeout(() => {
+        navigate("/admin/post");
+      }, 2000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isSuccess, navigate]);
 
   const handleAddTag = (e) => {
     e.preventDefault();
@@ -31,7 +42,7 @@ function CreatePostForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className={styles.formContainer}>
       <input
         type="text"
         placeholder="Title"
@@ -43,7 +54,7 @@ function CreatePostForm() {
         value={content}
         onChange={(e) => setContent(e.target.value)}
       />
-      <div>
+      <div className={styles.inputTagContainer}>
         <input
           type="text"
           placeholder="Add a tag"
@@ -52,15 +63,23 @@ function CreatePostForm() {
         />
         <button onClick={handleAddTag}>Add Tag</button>
       </div>
+      <div className={styles.tagsContainer}>
+        {tags.map((tag, index) => (
+          <span className={styles.tag} key={index}>
+            {tag}
+          </span>
+        ))}
+      </div>
       <button type="submit" disabled={isLoading}>
         {isLoading ? "Submitting..." : "Create Post"}
       </button>
 
-      {/* Mostrar error si ocurre */}
-      {onError && <div>Error: {onError.message}</div>}
-
-      {/* Mensaje cuando el post se crea con éxito */}
-      {onSuccess && onSuccess.message}
+      {isSuccess && (
+        <div className={styles.success}>
+          {'Post creado exitosamente'}
+        </div>
+      )}
+      {isError && <div className={styles.error}>Error: {error.message}</div>}
     </form>
   );
 }

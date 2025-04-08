@@ -17,9 +17,6 @@ function Navbar() {
         <NavLink to="/about-me" className="nav-link">
           About Me
         </NavLink>
-        <NavLink to="/contact" className="nav-link">
-          Contact
-        </NavLink>
       </nav>
     </header>
   );

@@ -1,6 +1,6 @@
 import { useDeletePost, usePosts } from "../../api/blogApi";
 import { useNavigate } from "react-router";
-import Comments from "../../components/InsertComments";
+import styles from './adminPost.module.css'
 
 function Posts() {
   const { data, error, isLoading } = usePosts();
@@ -13,36 +13,26 @@ function Posts() {
 
   const dataPosts = data.posts;
 
-  const handleEdit = (id) => {
-    // Redirige al formulario de edición del post
-    navigate(`/edit/${id}`);
-  };
-
-  const handleInsert = () => {
-    // Redirige a la página de creación de un nuevo post
-    navigate("/create");
-  };
-
   const handleDelete = (id) => {
     mutate(id);
   };
 
   return (
-    <div>
+    <div className={styles.postContainer}>
       {Array.isArray(dataPosts) ? (
         dataPosts.map((dato) => (
-          <div key={dato.id}>
+          <div key={dato.id} className={styles.postCard}>
             <h3>{dato.title}</h3>
-            <p>{dato.content}</p>
+            <p>
+              {dato.content.length > 150
+                ? dato.content.slice(0, dato.content.indexOf(" ", 150)) + "..."
+                : dato.content}
+            </p>
             <img src={dato.image} alt="" />
             <div>
               {Array.isArray(dato.postTags) && dato.postTags.length > 0 ? (
                 dato.postTags.map((tag) => (
-                  <span
-                    key={tag.id}
-                  >
-                    #{tag.name}
-                  </span>
+                  <span key={tag.id}> #{tag.name}</span>
                 ))
               ) : (
                 <p>No tags</p>
@@ -51,28 +41,31 @@ function Posts() {
             <div>
               {Array.isArray(dato.comments) && dato.comments.length > 0 ? (
                 dato.comments.map((comment) => (
-                  <span
-                    key={comment.id}
-                  >
+                  <span key={comment.id}>
                     {comment.name}
                     {comment.content}
                   </span>
                 ))
               ) : (
-                <p>No tags</p>
+                <p>No comments</p>
               )}
             </div>
-            <button onClick={() => handleEdit(dato.id)}>Editar</button>
+            <button
+              onClick={() => {
+                console.log(typeof dato.id);
+                navigate(`/admin/edit/${dato.id}`);
+              }}
+            >
+              Editar
+            </button>
+
             <button onClick={() => handleDelete(dato.id)}>Eliminar</button>
           </div>
         ))
       ) : (
         <div>No posts available</div>
       )}
-      <button onClick={() => handleInsert()}>Agregar nueva entrada</button>
     </div>
-
-   
   );
 }
 

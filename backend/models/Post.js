@@ -3,7 +3,7 @@ import sequelize from "../config/database.js";
 import Tags from "./Tags.js";
 import PostTags from "./PostTags.js";
 import Images from "./Image.js";
-import Comments from './Comments.js'
+import Comments from "./Comments.js";
 
 const Post = sequelize.define(
   "post",
@@ -67,7 +67,7 @@ Post.getPaginatedPost = async function (limit, offset) {
         },
         {
           model: Comments,
-        }
+        },
       ],
     });
     console.log("posteos backend", posts);
@@ -173,8 +173,13 @@ Post.editPost = async (id, content) => {
       throw new Error("Post not found");
     }
 
+    const post = await Post.findByPk(id, { transaction: editTransaction });
+
+    // Eliminar todas las asociaciones previas de tags, aunque no vengan nuevos
+    await post.setPostTags([], { transaction: editTransaction });
+
     if (content.tags && content.tags.length > 0) {
-      // Encontrar o crear los tags
+      // Encontrar o crear los nuevos tags
       const tags = await Promise.all(
         content.tags.map(async (tagName) => {
           const [tag] = await Tags.findOrCreate({
@@ -185,13 +190,7 @@ Post.editPost = async (id, content) => {
         })
       );
 
-      // Obtener el post después de la actualización para usar el setTags
-      const post = await Post.findByPk(id, { transaction: editTransaction });
-
-      // Eliminar las asociaciones de tags previas
-      await post.setPostTags([], { transaction: editTransaction });
-
-      // Actualizar las relaciones de tags con el nuevo set
+      // Asociar los nuevos tags
       await post.setPostTags(tags, { transaction: editTransaction });
     }
 
@@ -207,7 +206,6 @@ Post.editPost = async (id, content) => {
           as: "postTags",
         },
       ],
-      transaction: editTransaction,
     });
   } catch (error) {
     // Revertir cambios en caso de error

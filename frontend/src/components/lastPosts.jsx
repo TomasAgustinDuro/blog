@@ -23,8 +23,8 @@ function LastPosts() {
           <div key={post.id} className={styles.card}>
             <h3 className={styles.title}>{post.title}</h3>
             <p className={styles.content}>
-              {post.content.length > 100
-                ? post.content.slice(0, post.content.indexOf(" ", 100)) + "..."
+              {post.content.length > 150
+                ? post.content.slice(0, post.content.indexOf(" ", 150)) + "..."
                 : post.content}
             </p>
             <img src={post.image} alt="" className={styles.image} />
