@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { usePostById, useEditPost } from "../api/blogApi";
+import { usePostById, useEditPost } from "../../api/blogApi";
 import { useParams } from "react-router";
 
 function EditPost() {

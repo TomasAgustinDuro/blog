@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useInsertComment } from "../api/blogApi";
+import styles from "./comments.module.css"
 
 function Comments() {
   const [name, setName] = useState("");
@@ -16,26 +17,27 @@ function Comments() {
   };
 
   return (
+   
     <form onSubmit={handleSubmit}>
       <input
         type="text"
         placeholder="name"
-        value={name} // Usamos `user` en lugar de `title`
+        value={name}
         onChange={(e) => setName(e.target.value)}
+        className={styles.input}
       />
       <textarea
         placeholder="Content"
         value={content}
         onChange={(e) => setContent(e.target.value)}
+        className={styles.textarea}
       />
-      <button type="submit" disabled={isLoading}>
+      <button type="submit" disabled={isLoading} className={styles.button}>
         {isLoading ? "Submitting..." : "Send Comment"}
       </button>
 
-      {/* Mostrar error si ocurre */}
       {onError && <div>Error: {onError.message}</div>}
 
-      {/* Mensaje cuando el comentario se envía con éxito */}
       {onSuccess && <div>{onSuccess.message}</div>}
     </form>
   );

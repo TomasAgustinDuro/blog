@@ -28,7 +28,8 @@ const createPosts = async (body) => {
     console.log(body);
     const response = await axios.post(
       "http://localhost:3000/post/create",
-      body
+      body,
+      { withCredentials: true }
     );
     return response.data;
   } catch (error) {
@@ -63,7 +64,8 @@ const editPosts = async (body) => {
   try {
     const response = await axios.put(
       `http://localhost:3000/post/edit/${id}`,
-      body
+      body,
+      { withCredentials: true }
     );
     return response.data;
   } catch (error) {
@@ -94,8 +96,8 @@ export const useEditPost = () => {
 // Obtain posts by id
 const fetchPostById = async (id) => {
   try {
-    console.log("ID enviado:", id.id);
-    const response = await axios.get(`http://localhost:3000/post/${id.id}`);
+    console.log("ID enviado:", id);
+    const response = await axios.get(`http://localhost:3000/post/${id}`);
     console.log(response.data.post);
     return response.data.post;
   } catch (error) {
@@ -123,7 +125,7 @@ const deletePost = async (id) => {
   try {
     console.log("ID que se envía al backend:", id); // Verificar el id
     const response = await axios.delete(
-      `http://localhost:3000/post/delete/${id}`
+      `http://localhost:3000/post/delete/${id}`, { withCredentials: true }
     );
     console.log(response.data.post);
     return response.data;
@@ -189,4 +191,3 @@ export const useInsertComment = () => {
     },
   });
 };
-

@@ -1,6 +1,6 @@
-import { useDeletePost, usePosts } from "../api/blogApi";
+import { useDeletePost, usePosts } from "../../api/blogApi";
 import { useNavigate } from "react-router";
-import Comments from "./InsertComments";
+import Comments from "../../components/InsertComments";
 
 function Posts() {
   const { data, error, isLoading } = usePosts();
@@ -26,8 +26,6 @@ function Posts() {
   const handleDelete = (id) => {
     mutate(id);
   };
-
-  console.log("a ver", dataPosts[0].comments);
 
   return (
     <div>
@@ -72,8 +70,6 @@ function Posts() {
         <div>No posts available</div>
       )}
       <button onClick={() => handleInsert()}>Agregar nueva entrada</button>
-
-       <Comments />
     </div>
 
    

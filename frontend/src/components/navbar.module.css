@@ -1,0 +1,16 @@
+.navBar {
+  border-bottom: solid 1px #3b82f6;
+  border-top: solid 1px #3b82f6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1em;
+}
+
+.navBar > * {
+  margin: 1em;
+  color: white;
+}
+
+.headerImg {
+  width: 25%;
+  top: 0;
+}
