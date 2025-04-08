@@ -1,0 +1,6 @@
+{
+    "rootDirectory": "frontend",
+    "buildCommand": "yarn build",
+    "outputDirectory": "dist"
+  }
+  
