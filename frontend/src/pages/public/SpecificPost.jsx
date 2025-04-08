@@ -1,8 +1,7 @@
 import { useParams } from "react-router-dom";
 import { usePostById } from "../../api/blogApi";
 import Comments from "../../components/InsertComments";
-import styles from "./SpecificPost.module.css";
-import Navbar from '../../components/navbar'
+import styles from "./specificPost.module.css";
 
 function SpecificPost() {
   const { id } = useParams();
