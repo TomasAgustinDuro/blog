@@ -17,10 +17,11 @@ const port = 3000; // Puedes cambiar el puerto que desees
 // Middleware para analizar el cuerpo de las solicitudes como JSON
 app.use(
   cors({
-    origin: "http://localhost:5173", // URL del frontend
+    origin: "https://blog-two-kappa-21.vercel.app",
     credentials: true,
   })
 );
+
 app.use(express.json()); // Esto reemplaza body-parser
 
 app.use(

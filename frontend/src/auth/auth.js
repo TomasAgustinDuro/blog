@@ -6,10 +6,11 @@ const loginUser = async ({ user, password }) => {
     console.log("Comenzando petición");
 
     const response = await axios.post(
-      "http://localhost:3000/login",
+      `${import.meta.env.VITE_API_URL}/login`,
       { user, password },
       { withCredentials: true }
     );
+    
     console.log(response.data);
     return response.data;
   } catch (error) {
