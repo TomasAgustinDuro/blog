@@ -8,6 +8,7 @@ const admin_password = process.env.ADMIN_PASSWORD;
 
 export class Login {
   static async loginUser(req, res) {
+    console.log("Solicitud de login recibida");
     const { user, password } = req.body;
 
     try {
