@@ -30,9 +30,9 @@ app.use(
     resave: false,
     saveUninitialized: false, // mejor false
     cookie: {
-      secure: false, // true en producción con HTTPS
+      secure: true,
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "none",
     },
   })
 );
