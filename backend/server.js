@@ -40,6 +40,7 @@ app.use(
 app.use("/login", loginRoute);
 
 app.get("/me", (req, res) => {
+  console.log(req.session);
   if (req.session.user) {
     console.log(req.session.user);
     res.json(req.session.user);
