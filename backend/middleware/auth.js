@@ -25,6 +25,14 @@ export class Login {
       req.session.authenticated = true;
       req.session.user = { username: user };
 
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error guardando sesión:", err);
+          return res.status(500).json({ error: "Error guardando sesión" });
+        }
+        return res.status(200).json("Sesión iniciada correctamente");
+      });
+
       // Verifica que la sesión se está configurando
       console.log("Sesión guardada:", req.session);
 
