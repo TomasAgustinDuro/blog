@@ -14,6 +14,8 @@ import { Post, Tags, PostTags } from "./models/index.js";
 const app = express();
 const port = 3000; // Puedes cambiar el puerto que desees
 
+app.set("trust proxy", 1);
+
 // Middleware para analizar el cuerpo de las solicitudes como JSON
 app.use(
   cors({
