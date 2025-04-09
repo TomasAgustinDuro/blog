@@ -19,22 +19,33 @@ app.set("trust proxy", 1);
 // Middleware para analizar el cuerpo de las solicitudes como JSON
 app.use(
   cors({
-    origin: "https://blog-two-kappa-21.vercel.app",
+    origin: ["https://blog-two-kappa-21.vercel.app", "http://localhost:5173"], // Incluye tu entorno de desarrollo
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
 
 app.use(express.json()); // Esto reemplaza body-parser
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://blog-two-kappa-21.vercel.app');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "secreto",
     resave: false,
-    saveUninitialized: false, // mejor false
+    saveUninitialized: false,
     cookie: {
-      secure: true,
+      secure: true, // Mantén true en producción con HTTPS
       httpOnly: true,
-      sameSite: "none",
+      sameSite: "none", // Importante para peticiones cross-origin
+      maxAge: 1000 * 60 * 60 * 24 // 1 día en milisegundos
     },
   })
 );
