@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 // Obtain posts
 const fetchPosts = async () => {
   try {
@@ -19,13 +24,12 @@ export const usePosts = () => {
   });
 };
 
-// Obtain posts
+// Paginated posts
 const fetchPaginatedPosts = async (page = 1) => {
   try {
     const response = await axios.get(
       `${import.meta.env.VITE_API_URL}/post?page=${page}`
     );
-
     return response.data;
   } catch (error) {
     throw new Error("Error al obtener los posts: " + error.message);
@@ -41,27 +45,19 @@ export const usePaginatedPosts = (page = 1) => {
   });
 };
 
-// Create posts
-
+// Create post
 const createPosts = async (body) => {
   try {
     const response = await axios.post(
       `${import.meta.env.VITE_API_URL}/post/create`,
       body,
-      { withCredentials: true }
+      { headers: getAuthHeaders() }
     );
-
     return response.data;
   } catch (error) {
-    if (error.response) {
-      console.error("Error en la respuesta del servidor:", error.response.data);
-      throw new Error(
-        error.response.data.message || "Error desconocido en el servidor"
-      );
-    } else {
-      console.error("Error en la request:", error.message);
-      throw new Error("Error de red: " + error.message);
-    }
+    throw new Error(
+      error.response?.data?.message || "Error al crear el post"
+    );
   }
 };
 
@@ -77,26 +73,20 @@ export const useCreatePosts = () => {
   });
 };
 
-// Edit posts
+// Edit post
 const editPosts = async (body) => {
   const id = body.id;
   try {
     const response = await axios.put(
-      `http://localhost:3000/post/edit/${id}`,
+      `${import.meta.env.VITE_API_URL}/post/edit/${id}`,
       body,
-      { withCredentials: true }
+      { headers: getAuthHeaders() }
     );
     return response.data;
   } catch (error) {
-    if (error.response) {
-      console.error("Error en la respuesta del servidor:", error.response.data);
-      throw new Error(
-        error.response.data.message || "Error desconocido en el servidor"
-      );
-    } else {
-      console.error("Error en la request:", error.message);
-      throw new Error("Error de red: " + error.message);
-    }
+    throw new Error(
+      error.response?.data?.message || "Error al editar el post"
+    );
   }
 };
 
@@ -112,7 +102,7 @@ export const useEditPost = () => {
   });
 };
 
-// Obtain posts by id
+// Get post by ID
 const fetchPostById = async (id) => {
   try {
     const response = await axios.get(
@@ -120,15 +110,9 @@ const fetchPostById = async (id) => {
     );
     return response.data.post;
   } catch (error) {
-    if (error.response) {
-      console.error("Error en la respuesta del servidor:", error.response.data);
-      throw new Error(
-        error.response.data.message || "Error desconocido en el servidor"
-      );
-    } else {
-      console.error("Error en la request:", error.message);
-      throw new Error("Error de red: " + error.message);
-    }
+    throw new Error(
+      error.response?.data?.message || "Error al obtener el post"
+    );
   }
 };
 
@@ -139,25 +123,18 @@ export const usePostById = (id) => {
   });
 };
 
-// Delete posts
+// Delete post
 const deletePost = async (id) => {
   try {
     const response = await axios.delete(
       `${import.meta.env.VITE_API_URL}/post/delete/${id}`,
-      { withCredentials: true }
+      { headers: getAuthHeaders() }
     );
-
     return response.data;
   } catch (error) {
-    if (error.response) {
-      console.error("Error en la respuesta del servidor:", error.response.data);
-      throw new Error(
-        error.response.data.message || "Error desconocido en el servidor"
-      );
-    } else {
-      console.error("Error en la request:", error.message);
-      throw new Error("Error de red: " + error.message);
-    }
+    throw new Error(
+      error.response?.data?.message || "Error al eliminar el post"
+    );
   }
 };
 
@@ -165,10 +142,10 @@ export const useDeletePost = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id) => deletePost(id),
+    mutationFn: deletePost,
     onSuccess: (data) => {
       console.log("Post eliminado exitosamente", data);
-      queryClient.invalidateQueries(["posts"]);
+      queryClient.invalidateQueries(["post"]);
     },
     onError: (error) => {
       console.error("Error al eliminar el post", error);
@@ -176,24 +153,18 @@ export const useDeletePost = () => {
   });
 };
 
+// Insert comment (no requiere auth)
 const insertComment = async (body) => {
   try {
     const response = await axios.post(
       `${import.meta.env.VITE_API_URL}/comments/create`,
       body
     );
-
     return response;
   } catch (error) {
-    if (error.response) {
-      console.error("Error en la respuesta del servidor:", error.response.data);
-      throw new Error(
-        error.response.data.message || "Error desconocido en el servidor"
-      );
-    } else {
-      console.error("Error en la request:", error.message);
-      throw new Error("Error de red: " + error.message);
-    }
+    throw new Error(
+      error.response?.data?.message || "Error al crear el comentario"
+    );
   }
 };
 
@@ -201,10 +172,10 @@ export const useInsertComment = () => {
   return useMutation({
     mutationFn: insertComment,
     onSuccess: (data) => {
-      console.log("Post creado exitosamente", data);
+      console.log("Comentario creado exitosamente", data);
     },
     onError: (error) => {
-      console.error("Error al crear el post", error);
+      console.error("Error al crear el comentario", error);
     },
   });
 };
