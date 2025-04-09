@@ -1,18 +1,20 @@
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
+import jwt from 'jsonwebtoken'
+import { JWT_SECRET } from "../config/config.js";
+
 
 dotenv.config();
 
-const admin_user = process.env.ADMIN_USER;
+const ADMIN_USER = process.env.ADMIN_USER;
 const admin_password = process.env.ADMIN_PASSWORD;
 
 export class Login {
   static async loginUser(req, res) {
-    console.log("Solicitud de login recibida");
     const { user, password } = req.body;
 
     try {
-      if (user !== admin_user) {
+      if (user !== ADMIN_USER) {
         return res.status(401).json({ message: "Usuario incorrecto" });
       }
 
@@ -22,14 +24,13 @@ export class Login {
         return res.status(401).json({ message: "Contraseña incorrecta" });
       }
 
-      req.session.authenticated = true;
-      req.session.user = user;
-
-      req.session.save(() => {
-        console.log("Sesión guardada:", req.session);
-        res.status(200).json({ message: "Sesión iniciada correctamente" });
+      const token = jwt.sign({ username: user }, JWT_SECRET, {
+        expiresIn: "2h",
       });
+
+      res.json({ token });
     } catch (error) {
+      console.error("Error al hacer login:", error);
       return res.status(500).json({ error: error.message });
     }
   }

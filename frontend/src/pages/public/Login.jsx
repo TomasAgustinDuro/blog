@@ -1,24 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useLoginUser } from "../../auth/auth";
-import styles from './login.module.css'
+import { AuthContext } from "../../auth/authContext";
+import { useNavigate } from "react-router-dom";
+import styles from './login.module.css';
 
 function Login() {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
 
-  const { mutate, isSuccess, isError, error, data } = useLoginUser()
+  const { fetchUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const { mutate, isSuccess, isError, error, data } = useLoginUser(fetchUser);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Creamos el nuevo post
     const newUser = { user, password };
-
-    console.log("Enviando post: ", newUser);
-
-    // Ejecutamos la mutación con el post
     mutate(newUser);
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      navigate("/admin");
+    }
+  }, [isSuccess]);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -40,11 +45,8 @@ function Login() {
         Login
       </button>
 
-      {/* Mostrar error si ocurre */}
       {isError && <div>Error: {error.message}</div>}
-
-      {/* Mensaje cuando el post se crea con éxito */}
-      {isSuccess && isSuccess.message}
+      {isSuccess && <div>¡Login exitoso! Bienvenido {data.username}</div>}
     </form>
   );
 }

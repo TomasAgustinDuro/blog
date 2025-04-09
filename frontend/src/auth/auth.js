@@ -3,26 +3,23 @@ import axios from "axios";
 
 const loginUser = async ({ user, password }) => {
   try {
-    console.log("Comenzando petición");
-
     const response = await axios.post(
       `${import.meta.env.VITE_API_URL}/login`,
       { user, password },
-      { withCredentials: true }
     );
     
-    console.log(response.data);
+    localStorage.setItem('token', response.data.token)
     return response.data;
   } catch (error) {
     throw new Error("Error al iniciar sesión: " + error.message);
   }
 };
 
-export const useLoginUser = () => {
+export const useLoginUser = (fetchUser) => {
   return useMutation({
     mutationFn: loginUser,
-    onSuccess: (data) => {
-      console.log("Login realizado exitosamente", data);
+    onSuccess: async (data) => {
+      await fetchUser(); // 👈 ¡forzamos que actualice el user en el contexto!
     },
     onError: (error) => {
       console.error("Error al iniciar sesión", error);

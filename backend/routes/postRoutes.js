@@ -1,6 +1,6 @@
 import express from "express";
 import { PostControllers } from "../controllers/postControllers.js";
-import { requireLogin } from "../middleware/requireLogin.js";
+import {verifyToken} from '../middleware/verifyToken.js'
 
 const router = express.Router();
 
@@ -16,15 +16,15 @@ router.get("/:tag", (req, res) => {
   PostControllers.getByTag(req, res);
 });
 
-router.post("/create", requireLogin, (req, res) => {
+router.post("/create", verifyToken, (req, res) => {
   PostControllers.createPost(req, res);
 });
 
-router.put("/edit/:id", requireLogin, (req, res) => {
+router.put("/edit/:id", verifyToken, (req, res) => {
   PostControllers.editPost(req, res);
 });
 
-router.delete("/delete/:id", requireLogin, (req, res) => {
+router.delete("/delete/:id", verifyToken, (req, res) => {
   PostControllers.deletePost(req, res);
 });
 

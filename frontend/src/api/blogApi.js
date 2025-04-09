@@ -4,9 +4,7 @@ import axios from "axios";
 // Obtain posts
 const fetchPosts = async () => {
   try {
-    console.log("Comenzando petición");
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/post`);
-    console.log(response.data);
     return response.data;
   } catch (error) {
     throw new Error("Error al obtener los posts: " + error.message);
@@ -24,11 +22,10 @@ export const usePosts = () => {
 // Obtain posts
 const fetchPaginatedPosts = async (page = 1) => {
   try {
-    console.log("Comenzando petición");
     const response = await axios.get(
       `${import.meta.env.VITE_API_URL}/post?page=${page}`
     );
-    console.log(response.data);
+
     return response.data;
   } catch (error) {
     throw new Error("Error al obtener los posts: " + error.message);
@@ -82,7 +79,6 @@ export const useCreatePosts = () => {
 
 // Edit posts
 const editPosts = async (body) => {
-  console.log("editpost", body.id);
   const id = body.id;
   try {
     const response = await axios.put(

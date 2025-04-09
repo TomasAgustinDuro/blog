@@ -10,12 +10,22 @@ export const AuthProvider = ({ children }) => {
   const fetchUser = async () => {
     try {
       setLoading(true);
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setUser(null);
+        return;
+      }
+
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/me`, {
-        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      console.log(res.data.username)
+
       setUser(res.data.username);
     } catch (error) {
+      console.error("Error al obtener el usuario:", error);
       setUser(null);
     } finally {
       setLoading(false);

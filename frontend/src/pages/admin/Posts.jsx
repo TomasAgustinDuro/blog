@@ -52,7 +52,6 @@ function Posts() {
             </div>
             <button
               onClick={() => {
-                console.log(typeof dato.id);
                 navigate(`/admin/edit/${dato.id}`);
               }}
             >
