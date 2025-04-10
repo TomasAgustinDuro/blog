@@ -11,7 +11,6 @@ import cors from "cors";
 
 import { Post, Tags, PostTags } from "./models/index.js";
 
-await sequelize.sync({ force: true });
 
 // Crear una instancia de Express
 const app = express();
@@ -49,7 +48,6 @@ app.use("/postTags", postTagsRoutes);
 // 🔁 Función principal
 const init = async () => {
   try {
-    await sequelize.sync();
     console.log("✅ Base de datos sincronizada (force: true)");
 
     app.listen(port, () => {
