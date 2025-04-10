@@ -9,12 +9,13 @@ export const verifyToken = (req, res, next) => {
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
-      console.error("Error verificando token:", err); // 👈 y esto
+      console.error("Error verificando token:", err);
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({ message: "Token expirado" });
+      }
       return res.status(403).json({ message: "Token inválido" });
     }
     req.user = user;
     next();
   });
 };
-
-

@@ -4,11 +4,14 @@ import commentsRoutes from "./routes/commentRoutes.js";
 import tagsRoutes from "./routes/tagsRoutes.js";
 import postTagsRoutes from "./routes/postTagsRoutes.js";
 import loginRoute from "./routes/loginRoute.js";
-import {verifyToken} from './middleware/verifyToken.js'
+import { verifyToken } from "./middleware/verifyToken.js";
+import sequelize from "./config/database.js";
 
 import cors from "cors";
 
 import { Post, Tags, PostTags } from "./models/index.js";
+
+await sequelize.sync({ force: true });
 
 // Crear una instancia de Express
 const app = express();
@@ -43,7 +46,18 @@ app.use("/comments", commentsRoutes);
 app.use("/tags", tagsRoutes);
 app.use("/postTags", postTagsRoutes);
 
-// Levantar el servidor
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+// 🔁 Función principal
+const init = async () => {
+  try {
+    await sequelize.sync();
+    console.log("✅ Base de datos sincronizada (force: true)");
+
+    app.listen(port, () => {
+      console.log(`🚀 Server running at http://localhost:${port}`);
+    });
+  } catch (error) {
+    console.error("❌ Error al iniciar el servidor:", error.message);
+  }
+};
+
+init();

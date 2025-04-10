@@ -31,6 +31,7 @@ Post.getAllPost = async function () {
   const posts = await Post.findAll();
   return posts;
 };
+
 Post.getSpecificPost = async function (id) {
   const post = await Post.findByPk(id, {
     include: [
@@ -38,6 +39,9 @@ Post.getSpecificPost = async function (id) {
         model: Tags,
         as: "postTags",
         through: { attributes: [] },
+      },
+      {
+        model: Comments,
       },
     ],
   });

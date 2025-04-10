@@ -3,6 +3,7 @@ import { usePaginatedPosts } from "../../api/blogApi";
 import styles from "./publicPosts.module.css";
 import Pagination from "../../components/pagination";
 import { useState } from "react";
+import Spinner from "../../components/spinnner";
 
 function PublicPosts() {
   const navigate = useNavigate();
@@ -11,8 +12,7 @@ function PublicPosts() {
 
   const { data, error, isLoading } = usePaginatedPosts(page);
 
-
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Spinner />
 
   if (error) return <div>Error: {error.message}</div>;
 
@@ -65,7 +65,11 @@ function PublicPosts() {
         <div>No post available</div>
       )}
 
-      <Pagination totalPages={data.pagination.totalPages} currentPage={page} onPageChange={setPage} />
+      <Pagination
+        totalPages={data.pagination.totalPages}
+        currentPage={page}
+        onPageChange={setPage}
+      />
     </div>
   );
 }

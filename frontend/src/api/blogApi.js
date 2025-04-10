@@ -55,9 +55,7 @@ const createPosts = async (body) => {
     );
     return response.data;
   } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "Error al crear el post"
-    );
+    throw new Error(error.response?.data?.message || "Error al crear el post");
   }
 };
 
@@ -84,9 +82,7 @@ const editPosts = async (body) => {
     );
     return response.data;
   } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "Error al editar el post"
-    );
+    throw new Error(error.response?.data?.message || "Error al editar el post");
   }
 };
 
@@ -168,14 +164,46 @@ const insertComment = async (body) => {
   }
 };
 
-export const useInsertComment = () => {
+export const useInsertComment = (postId) => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: insertComment,
     onSuccess: (data) => {
       console.log("Comentario creado exitosamente", data);
+      queryClient.invalidateQueries(["post", Number(postId)]); // 👈 Refresca
     },
     onError: (error) => {
       console.error("Error al crear el comentario", error);
+    },
+  });
+};
+
+const deleteComment = async (id) => {
+  try {
+    const response = await axios.delete(
+      `${import.meta.env.VITE_API_URL}/comments/delete/${id}`,
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Error al eliminar el comentario"
+    );
+  }
+};
+
+export const useDeleteComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteComment,
+    onSuccess: (data) => {
+      console.log("Comment eliminado exitosamente", data);
+      queryClient.invalidateQueries(["comment"]);
+    },
+    onError: (error) => {
+      console.error("Error al eliminar el comentario", error);
     },
   });
 };

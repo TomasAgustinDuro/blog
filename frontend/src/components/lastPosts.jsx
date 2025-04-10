@@ -1,12 +1,14 @@
 import { useNavigate } from "react-router";
 import { usePosts } from "../api/blogApi";
-import styles from './lastPost.module.css'
+import styles from "./lastPost.module.css";
+import Spinner from "./spinnner";
 
 function LastPosts() {
   const { data, error, isLoading } = usePosts();
   const navigate = useNavigate();
 
-  if (isLoading) return <div>Loading...</div>;
+
+  if (isLoading) return <Spinner />
 
   if (error) return <div>Error: {error.message}</div>;
 
@@ -41,7 +43,10 @@ function LastPosts() {
             </div>
             <div className={styles.comments}>
               {Array.isArray(post.comments) && post.comments.length > 0 && (
-                <p>{post.comments.length} Comentarios</p>
+                <p>
+                  {post.comments.length}{" "}
+                  {post.comments.length === 1 ? "comentario" : "comentarios"}
+                </p>
               )}
             </div>
             <button

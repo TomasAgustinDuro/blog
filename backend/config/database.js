@@ -1,10 +1,13 @@
 // config/database.js
 import { Sequelize } from "sequelize";
+import dotenv from 'dotenv'
 
-const sequelize = new Sequelize({
-  dialect: "sqlite",
-  storage: "./db.sqlite", // Ruta de tu base de datos SQLite
-  logging: console.log,
+dotenv.config()
+
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: "postgres",
+  protocol: "postgres",
+  logging: false,
 });
 
 

@@ -2,12 +2,13 @@ import { useParams } from "react-router-dom";
 import { usePostById } from "../../api/blogApi";
 import Comments from "../../components/InsertComments";
 import styles from "./specificPost.module.css";
+import Spinner from "../../components/spinnner";
 
 function SpecificPost() {
   const { id } = useParams();
   const { data: post, error, isLoading } = usePostById(id);
 
-  if (isLoading) return <p>Cargando...</p>;
+  if (isLoading) return <Spinner />
   if (error) return <p>Error al cargar el post.</p>;
   if (!post) return <p>No se encontró el post.</p>;
 
@@ -46,7 +47,7 @@ function SpecificPost() {
         </div>
       </div>
 
-      <Comments />
+      <Comments postId = {id} />
     </div>
   );
 }

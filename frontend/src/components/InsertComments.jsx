@@ -1,23 +1,32 @@
 import { useState } from "react";
 import { useInsertComment } from "../api/blogApi";
-import styles from "./comments.module.css"
+import styles from "./comments.module.css";
 
-function Comments() {
+function Comments({ postId }) {
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
 
-  const { mutate, isLoading, onSuccess, onError } = useInsertComment();
+  const {
+    mutate: insertComment,
+    isLoading,
+    onSuccess,
+    onError,
+  } = useInsertComment();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newComment = { name, content };
+    const newComment = { name, content, post_id: postId };
 
-    mutate(newComment);
+    insertComment(newComment, {
+      onSuccess: () => {
+        setName("");
+        setContent("");
+      },
+    });
   };
 
   return (
-   
     <form onSubmit={handleSubmit}>
       <input
         type="text"

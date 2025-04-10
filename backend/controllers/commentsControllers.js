@@ -48,7 +48,7 @@ export class CommentsControllers {
     const {id} = req.params;
 
     try {
-      await Comments.deleteComment(id);
+      await Comments.deleteComments(id);
       return res.status(204).send()
     } catch(error) {
       return res.status(500).json({error: error.message})

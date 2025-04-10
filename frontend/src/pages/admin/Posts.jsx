@@ -1,10 +1,11 @@
-import { useDeletePost, usePosts } from "../../api/blogApi";
+import { useDeletePost, usePosts, useDeleteComment } from "../../api/blogApi";
 import { useNavigate } from "react-router";
-import styles from './adminPost.module.css'
+import styles from "./adminPost.module.css";
 
 function Posts() {
   const { data, error, isLoading } = usePosts();
-  const { mutate, onError, onSucess } = useDeletePost();
+  const { mutate: deletePost, onError, onSucess } = useDeletePost();
+  const { mutate: deleteComment, isError, isSucess } = useDeleteComment();
   const navigate = useNavigate();
 
   if (isLoading) return <div>Loading...</div>;
@@ -13,8 +14,14 @@ function Posts() {
 
   const dataPosts = data.posts;
 
-  const handleDelete = (id) => {
-    mutate(id);
+  const handleDeletePost = (id) => {
+    deletePost(id);
+  };
+
+  const handleDeleteComment = (id) => {
+    if (confirm("¿Desea eliminar este comentario?")) {
+      deleteComment(id);
+    }
   };
 
   return (
@@ -38,16 +45,21 @@ function Posts() {
                 <p>No tags</p>
               )}
             </div>
-            <div>
+            <div className={styles.comments}>
               {Array.isArray(dato.comments) && dato.comments.length > 0 ? (
                 dato.comments.map((comment) => (
-                  <span key={comment.id}>
-                    {comment.name}
-                    {comment.content}
-                  </span>
+                  <div key={comment.id} className={styles.comment}>
+                    <div className={styles.textComment}>
+                      <p className={styles.commentAuthor}>{comment.name}</p>
+                      <p className={styles.commentText}>{comment.content}</p>
+                    </div>
+                    <button onClick={() => handleDeleteComment(comment.id)}>
+                      X
+                    </button>
+                  </div>
                 ))
               ) : (
-                <p>No comments</p>
+                <p className={styles.noComments}>No comments</p>
               )}
             </div>
             <button
@@ -58,7 +70,7 @@ function Posts() {
               Editar
             </button>
 
-            <button onClick={() => handleDelete(dato.id)}>Eliminar</button>
+            <button onClick={() => handleDeletePost(dato.id)}>Eliminar</button>
           </div>
         ))
       ) : (
