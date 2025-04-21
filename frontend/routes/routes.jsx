@@ -2,7 +2,7 @@ import ProtectedRoutes from "./protectedRoutes";
 import { Routes, Route } from "react-router";
 import Posts from "../src/pages/admin/Posts";
 import EditPost from "../src/pages/admin/EditPost";
-import CreatePostForm from "../src/pages/admin/insertPost";
+import CreatePostForm from "../src/pages/admin/creatPostComponent/insertPost";
 import Login from "../src/pages/public/Login";
 import PublicPosts from "../src/pages/public/PublicPosts";
 import Home from "../src/pages/public/Home";

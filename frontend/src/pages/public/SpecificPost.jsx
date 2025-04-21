@@ -3,12 +3,24 @@ import { usePostById } from "../../api/blogApi";
 import Comments from "../../components/InsertComments";
 import styles from "./specificPost.module.css";
 import Spinner from "../../components/spinnner";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
 function SpecificPost() {
   const { id } = useParams();
+
   const { data: post, error, isLoading } = usePostById(id);
 
-  if (isLoading) return <Spinner />
+  const editor = useEditor(
+    {
+      extensions: [StarterKit],
+      content: post?.content || "", 
+      editable: false,
+    },
+    [post]
+  ); 
+
+  if (isLoading) return <Spinner />;
   if (error) return <p>Error al cargar el post.</p>;
   if (!post) return <p>No se encontró el post.</p>;
 
@@ -16,23 +28,7 @@ function SpecificPost() {
     <div className={styles.container}>
       <div className={styles.card}>
         <h3 className={styles.title}>{post.title}</h3>
-        <p className={styles.content}>{post.content}</p>
-        <img src={post.image} alt="" className={styles.image} />
-
-        <div className={styles.tags}>
-          {Array.isArray(post.postTags) && post.postTags.length > 0 ? (
-            post.postTags.map((tag) => (
-              <span key={tag.id} className={styles.tag}>
-                #{tag.name}
-              </span>
-            ))
-          ) : (
-            <p>No tags</p>
-          )}
-        </div>
-
-        <hr className={styles.divider} />
-
+        {editor && <EditorContent editor={editor} className={styles.content} />}
         <div className={styles.comments}>
           {Array.isArray(post.comments) && post.comments.length > 0 ? (
             post.comments.map((comment) => (
@@ -47,7 +43,7 @@ function SpecificPost() {
         </div>
       </div>
 
-      <Comments postId = {id} />
+      <Comments postId={id} />
     </div>
   );
 }

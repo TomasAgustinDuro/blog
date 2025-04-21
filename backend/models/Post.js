@@ -13,7 +13,7 @@ const Post = sequelize.define(
       allowNull: false,
     },
     content: {
-      type: DataTypes.TEXT,
+      type: DataTypes.TEXT("long"), // Usar TEXT('long') para contenido HTML largo
       allowNull: false,
     },
     date: {

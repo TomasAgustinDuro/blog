@@ -1,47 +1,48 @@
 .formContainer {
   color: #f5f5f5;
   border-radius: 12px;
+  width: 100%;
   box-sizing: border-box;
   margin: 2rem auto;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
 }
 
 input,
-textarea {
+.tiptapEditor {
   color: #f5f5f5;
   border: 1px solid #444;
+  background-color: #302c34;
   padding: 1em;
   border-radius: 8px;
-  margin-bottom: 1rem;
+  margin: 1em ;
   font-size: 1rem;
+  text-align: start;
   transition: border 0.3s ease;
 }
 
 input:focus,
-textarea:focus {
+.tiptapEditor:focus {
   border-color: #5c9ded;
   outline: none;
 }
 
-textarea {
+.tiptapEditor {
   min-height: 250px;
   resize: vertical;
   line-height: 1.6;
   resize: none;
 }
 
-.inputTagContainer{
-    display: flex;
-    justify-content: center;
-    gap: 1em;
-    align-items: center;
+.inputTagContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  align-items: center;
 }
 
 .inputTagContainer > * {
-    margin: 1em 0;
+  margin: 1em 0;
 }
-
-
 
 .tagsContainer {
   display: flex;

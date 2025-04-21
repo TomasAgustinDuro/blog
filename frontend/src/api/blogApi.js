@@ -100,12 +100,15 @@ export const useEditPost = () => {
 
 // Get post by ID
 const fetchPostById = async (id) => {
+  console.log("id", id);
   try {
+    console.log("id", id);
     const response = await axios.get(
       `${import.meta.env.VITE_API_URL}/post/${id}`
     );
     return response.data.post;
   } catch (error) {
+    console.log("id", id);
     throw new Error(
       error.response?.data?.message || "Error al obtener el post"
     );
@@ -113,6 +116,7 @@ const fetchPostById = async (id) => {
 };
 
 export const usePostById = (id) => {
+  console.log("id use", id);
   return useQuery({
     queryKey: ["post", id],
     queryFn: () => fetchPostById(id),

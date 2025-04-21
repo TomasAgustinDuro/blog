@@ -5,6 +5,11 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@tiptap/extension-color": "^2.11.7",
+    "@tiptap/extension-document": "^2.11.7",
+    "@tiptap/extension-paragraph": "^2.11.7",
+    "@tiptap/extension-text": "^2.11.7",
+    "@tiptap/extension-text-style": "^2.11.7",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",

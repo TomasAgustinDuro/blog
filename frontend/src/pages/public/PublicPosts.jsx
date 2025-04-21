@@ -5,6 +5,25 @@ import Pagination from "../../components/pagination";
 import { useState } from "react";
 import Spinner from "../../components/spinnner";
 
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+
+const TruncatedEditor = ({ html, maxLength = 200 }) => {
+  // Cortar el contenido (similar a Opción 1)
+  const truncatedContent =
+    html.length > maxLength
+      ? html.slice(0, html.indexOf(" ", maxLength)) + "..."
+      : html;
+
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: truncatedContent,
+    editable: false, 
+  });
+
+  return <EditorContent editor={editor} className={styles.content} />;
+};
+
 function PublicPosts() {
   const navigate = useNavigate();
 
@@ -12,7 +31,7 @@ function PublicPosts() {
 
   const { data, error, isLoading } = usePaginatedPosts(page);
 
-  if (isLoading) return <Spinner />
+  if (isLoading) return <Spinner />;
 
   if (error) return <div>Error: {error.message}</div>;
 
@@ -26,11 +45,7 @@ function PublicPosts() {
         data.posts.map((post) => (
           <div key={post.id} className={styles.publicPostsContainer}>
             <h3>{post.title}</h3>
-            <p className={styles.content}>
-              {post.content.length > 200
-                ? post.content.slice(0, post.content.indexOf(" ", 200)) + "..."
-                : post.content}
-            </p>
+            <TruncatedEditor html={post.content} />
             <img src={post.image} alt="" />
             <button
               className={styles.button}
