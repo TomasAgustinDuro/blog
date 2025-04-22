@@ -3,10 +3,12 @@ import { useCreatePosts } from "../../../api/blogApi";
 import styles from "./insertPost.module.css";
 import { useNavigate } from "react-router";
 import { Color } from "@tiptap/extension-color"; // Añadido
+import { Image } from "@tiptap/extension-image";
 import TextStyle from "@tiptap/extension-text-style";
-import { EditorProvider, useCurrentEditor } from "@tiptap/react";
+import { EditorProvider } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { MenuBar } from "./components/MenuBar";
+import { useImages } from "../../../context/ImagesContext";
 
 const extensions = [
   Color.configure({ types: [TextStyle.name] }), // Eliminado ListItem.name
@@ -20,6 +22,15 @@ const extensions = [
       keepMarks: true,
       keepAttributes: false,
     },
+    gapcursor: false, // 👈 Desactiva el Gapcursor integrado
+  }),
+  Image.configure({
+    HTMLAttributes: {
+      class: "tiptap-image",
+      "data-image-id": "", // Para rastrear imágenes
+    },
+    inline: true,
+    allowBase64: false,
   }),
 ];
 
@@ -28,6 +39,7 @@ function CreatePostForm() {
   const [content, setContent] = useState("<p>¡Escribe aquí tu contenido!</p>");
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState("");
+  const { images, featuredImageId } = useImages();
   const navigate = useNavigate();
 
   const { mutate, isLoading, isSuccess, isError, error } = useCreatePosts();
@@ -36,7 +48,12 @@ function CreatePostForm() {
     e.preventDefault();
 
     // Creamos el nuevo post
-    const newPost = { title, content, tags };
+    const newPost = {
+      title,
+      content,
+      tags,
+      images: images.map((img) => ({ id: img.id })),
+    };
 
     // Ejecutamos la mutación con el post
     mutate(newPost);
@@ -60,6 +77,7 @@ function CreatePostForm() {
     }
   };
 
+
   return (
     <form onSubmit={handleSubmit} className={styles.formContainer}>
       <input
@@ -75,14 +93,14 @@ function CreatePostForm() {
           content={content}
           editorProps={{
             attributes: {
-              class: `${styles.tiptapEditor} otra-clase-generica`,
+              class: `${styles.tiptapEditor}`,
             },
           }}
           slotBefore={<MenuBar />}
           onUpdate={({ editor }) => {
             setContent(editor.getHTML());
           }}
-        ></EditorProvider>
+        />
       </div>
 
       <div className={styles.inputTagContainer}>

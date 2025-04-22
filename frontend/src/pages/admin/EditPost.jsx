@@ -3,6 +3,14 @@ import { usePostById, useEditPost } from "../../api/blogApi";
 import { useParams } from "react-router";
 import styles from "./editPost.module.css";
 import { useNavigate } from "react-router";
+import { Color } from "@tiptap/extension-color"; // Añadido
+import { Image } from "@tiptap/extension-image";
+import TextStyle from "@tiptap/extension-text-style";
+import { EditorProvider } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { MenuBar } from "../admin/creatPostComponent/components/MenuBar";
+import { useImages } from "../../context/ImagesContext";
+import { useRef } from "react";
 
 function EditPost() {
   const { id } = useParams();
@@ -12,14 +20,46 @@ function EditPost() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
+  const { images, featuredImageId } = useImages();
   const [currentTag, setCurrentTag] = useState("");
   const { mutate, isLoading, isSuccess, isError, error, data } = useEditPost();
+
+  const editorRef = useRef(null)
+
+  const extensions = [
+    Color.configure({ types: [TextStyle.name] }), // Eliminado ListItem.name
+    TextStyle,
+    StarterKit.configure({
+      bulletList: {
+        keepMarks: true,
+        keepAttributes: false,
+      },
+      orderedList: {
+        keepMarks: true,
+        keepAttributes: false,
+      },
+      gapcursor: false, // 👈 Desactiva el Gapcursor integrado
+    }),
+    Image.configure({
+      HTMLAttributes: {
+        class: "tiptap-image",
+        "data-image-id": "", // Para rastrear imágenes
+      },
+      inline: true,
+      allowBase64: false,
+    }),
+  ];
 
   // Manejar el envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const body = { id, title, content, tags };
+    const body = {
+      id,
+      title,
+      content: editorRef.current?.getHTML(), 
+      tags,
+    };
     mutate(body);
   };
 
@@ -34,8 +74,8 @@ function EditPost() {
   useEffect(() => {
     if (isSuccess) {
       const timeout = setTimeout(() => {
-        navigate("/admin/post"); 
-      }, 2000); 
+        navigate("/admin/post");
+      }, 2000);
 
       return () => clearTimeout(timeout);
     }
@@ -44,7 +84,6 @@ function EditPost() {
   useEffect(() => {
     if (post) {
       setTitle(post.title);
-      setContent(post.content);
       setTags(post.postTags.map((tag) => tag.name));
     }
   }, [post]);
@@ -54,45 +93,55 @@ function EditPost() {
   };
 
   return (
-    <div className={styles.editContainer}>
-      <h2>Editar</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+    <form onSubmit={handleSubmit} className={styles.editContainer}>
+      <input
+        type="text"
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <div>
+        <EditorProvider
+          extensions={extensions}
+          key={post?.id || "default"} // 👈 Fuerza que se reinicialice
+          content={post?.content || "<p>Cargando...</p>"}
+          editorProps={{
+            attributes: {
+              class: `${styles.tiptapEditor}`,
+            },
+          }}
+          slotBefore={<MenuBar />}
+          onUpdate={({ editor }) => {
+            // Solo actualizás al enviar, no hacés setContent en cada keystroke
+            editorRef.current = editor;
+          }}
         />
-        <textarea
-          placeholder="Content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
-        <div className={styles.tagList}>
-          {tags.map((tag, index) => (
-            <div key={index} className={styles.tagItem}>
-              <p>{tag}</p>
-              <button type="button" onClick={() => handleRemoveTag(tag)}>
-                X
-              </button>
-            </div>
-          ))}
-        </div>
-        <input
-          type="text"
-          placeholder="Tags"
-          value={currentTag}
-          onChange={(e) => setCurrentTag(e.target.value)}
-        />
-        <div className={styles.buttonGroup}>
-          <button type="button" onClick={handleAddTag}>
-            Add Tag
-          </button>
-          <button type="submit" disabled={isLoading}>
-            {isLoading ? "Submitting..." : "Edit Post"}
-          </button>
-        </div>
-      </form>
+      </div>
+
+      <div className={styles.tagList}>
+        {tags.map((tag, index) => (
+          <div key={index} className={styles.tagItem}>
+            <p>{tag}</p>
+            <button type="button" onClick={() => handleRemoveTag(tag)}>
+              X
+            </button>
+          </div>
+        ))}
+      </div>
+      <input
+        type="text"
+        placeholder="Tags"
+        value={currentTag}
+        onChange={(e) => setCurrentTag(e.target.value)}
+      />
+      <div className={styles.buttonGroup}>
+        <button type="button" onClick={handleAddTag}>
+          Add Tag
+        </button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Submitting..." : "Edit Post"}
+        </button>
+      </div>
 
       {isError && <div className={styles.error}>Error: {error.message}</div>}
       {isSuccess && (
@@ -100,7 +149,7 @@ function EditPost() {
           {data?.message || "Post editado exitosamente"}
         </div>
       )}
-    </div>
+    </form>
   );
 }
 export default EditPost;

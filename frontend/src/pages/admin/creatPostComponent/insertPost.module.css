@@ -14,7 +14,7 @@ input,
   background-color: #302c34;
   padding: 1em;
   border-radius: 8px;
-  margin: 1em ;
+  margin: 1em;
   font-size: 1rem;
   text-align: start;
   transition: border 0.3s ease;
@@ -31,6 +31,13 @@ input:focus,
   resize: vertical;
   line-height: 1.6;
   resize: none;
+}
+
+.tiptapEditor img {
+  width: 25%;
+  height: auto;
+  cursor: move; 
+  max-width: 100%; 
 }
 
 .inputTagContainer {

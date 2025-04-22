@@ -153,7 +153,7 @@ export const useDeletePost = () => {
   });
 };
 
-// Insert comment (no requiere auth)
+// Insert comment 
 const insertComment = async (body) => {
   try {
     const response = await axios.post(

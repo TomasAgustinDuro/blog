@@ -5,24 +5,18 @@ import Pagination from "../../components/pagination";
 import { useState } from "react";
 import Spinner from "../../components/spinnner";
 
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 
-const TruncatedEditor = ({ html, maxLength = 200 }) => {
-  // Cortar el contenido (similar a Opción 1)
-  const truncatedContent =
-    html.length > maxLength
-      ? html.slice(0, html.indexOf(" ", maxLength)) + "..."
-      : html;
-
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: truncatedContent,
-    editable: false, 
-  });
-
-  return <EditorContent editor={editor} className={styles.content} />;
+const getPlainText = (html) => {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent || "";
 };
+
+const getTruncatedText = (text, maxLength) => {
+  if (text.length <= maxLength) return text;
+  const cutIndex = text.indexOf(" ", maxLength);
+  return text.slice(0, cutIndex > -1 ? cutIndex : maxLength) + "...";
+};
+
 
 function PublicPosts() {
   const navigate = useNavigate();
@@ -40,12 +34,12 @@ function PublicPosts() {
   };
 
   return (
-    <div>
+    <div className={styles.container}>
       {Array.isArray(data.posts) ? (
         data.posts.map((post) => (
           <div key={post.id} className={styles.publicPostsContainer}>
             <h3>{post.title}</h3>
-            <TruncatedEditor html={post.content} />
+            <p>{getTruncatedText(getPlainText(post.content), 200)}</p>
             <img src={post.image} alt="" />
             <button
               className={styles.button}

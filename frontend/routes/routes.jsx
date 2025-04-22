@@ -9,6 +9,8 @@ import Home from "../src/pages/public/Home";
 import AboutMe from "../src/pages/public/aboutMe";
 import SpecificPost from "../src/pages/public/SpecificPost";
 import Admin from "../src/pages/admin/Admin";
+import { ImagesContextProvider } from "../src/context/ImagesContext";
+// import CloudinaryUploader from "../src/components/cloudinary";
 
 const AppRoutes = () => {
   return (
@@ -23,7 +25,9 @@ const AppRoutes = () => {
           path="create"
           element={
             <ProtectedRoutes>
-              <CreatePostForm />
+              <ImagesContextProvider>
+                <CreatePostForm />
+              </ImagesContextProvider>
             </ProtectedRoutes>
           }
         />
@@ -31,7 +35,9 @@ const AppRoutes = () => {
           path="edit/:id"
           element={
             <ProtectedRoutes>
-              <EditPost/>
+              <ImagesContextProvider>
+                <EditPost />
+              </ImagesContextProvider>
             </ProtectedRoutes>
           }
         />

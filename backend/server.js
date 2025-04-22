@@ -5,6 +5,7 @@ import tagsRoutes from "./routes/tagsRoutes.js";
 import postTagsRoutes from "./routes/postTagsRoutes.js";
 import loginRoute from "./routes/loginRoute.js";
 import { verifyToken } from "./middleware/verifyToken.js";
+import imagesRoutes from './routes/imagesRoutes.js'
 import sequelize from "./config/database.js";
 
 import cors from "cors";
@@ -44,10 +45,12 @@ app.use("/post", postRoutes);
 app.use("/comments", commentsRoutes);
 app.use("/tags", tagsRoutes);
 app.use("/postTags", postTagsRoutes);
+app.use("/images", imagesRoutes)
 
 // 🔁 Función principal
 const init = async () => {
   try {
+
     console.log("✅ Base de datos sincronizada (force: true)");
 
     app.listen(port, () => {

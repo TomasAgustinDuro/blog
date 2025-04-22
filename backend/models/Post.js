@@ -4,6 +4,7 @@ import Tags from "./Tags.js";
 import PostTags from "./PostTags.js";
 import Images from "./Image.js";
 import Comments from "./Comments.js";
+import PostImages from "./PostImages.js";
 
 const Post = sequelize.define(
   "post",
@@ -13,7 +14,7 @@ const Post = sequelize.define(
       allowNull: false,
     },
     content: {
-      type: DataTypes.TEXT("long"), // Usar TEXT('long') para contenido HTML largo
+      type: DataTypes.TEXT("long"), 
       allowNull: false,
     },
     date: {
@@ -42,6 +43,10 @@ Post.getSpecificPost = async function (id) {
       },
       {
         model: Comments,
+      },
+      {
+        model: Images,
+        as: "gallery"
       },
     ],
   });
@@ -102,13 +107,12 @@ Post.createPost = async (content) => {
       {
         title: content.title,
         content: content.content,
-        image_id: content.image_id || null,
         date: new Date(),
       },
       { transaction }
     );
 
-    if (content.tags && content.tags.length > 0) {
+    if (content.tags?.length > 0) {
       // Encontrar o crear tags
       const tags = await Promise.all(
         content.tags.map(async (tagName) => {
@@ -120,7 +124,6 @@ Post.createPost = async (content) => {
         })
       );
 
-      // Crear asociaciones manualmente
       await Promise.all(
         tags.map((tag) =>
           PostTags.create(
@@ -134,20 +137,41 @@ Post.createPost = async (content) => {
       );
     }
 
+    if (content.images?.length > 0) {
+      await Promise.all(
+        content.images.map((img, index) =>
+          PostImages.create(
+            {
+              post_id: post.id,
+              image_id: img.id,
+              is_featured: index === 0,
+              order: index,
+            },
+            { transaction }
+          )
+        )
+      );
+    }
+
     // Recuperar post con tags
-    const postWithTags = await Post.findByPk(post.id, {
+    const postComplete = await Post.findByPk(post.id, {
       include: [
         {
           model: Tags,
           as: "postTags",
           through: { attributes: [] },
         },
+        {
+          model: Images,
+          as: "gallery", // 👈 Debe coincidir con tu asociación
+          through: { attributes: ["is_featured", "order"] }, // 👈 Campos puente
+        },
       ],
     });
 
     await transaction.commit();
 
-    return postWithTags;
+    return postComplete;
   } catch (error) {
     await transaction.rollback();
     throw error;
@@ -158,12 +182,11 @@ Post.editPost = async (id, content) => {
   const editTransaction = await sequelize.transaction();
 
   try {
-    // Actualizar el post
+    // 1. Actualizá los campos del post
     const [updatedPost] = await Post.update(
       {
         title: content.title,
         content: content.content,
-        image_id: content.image_id || null,
         date: new Date(),
       },
       {
@@ -172,18 +195,16 @@ Post.editPost = async (id, content) => {
       }
     );
 
-    // Verificar si se ha actualizado el post
     if (updatedPost === 0) {
       throw new Error("Post not found");
     }
 
     const post = await Post.findByPk(id, { transaction: editTransaction });
 
-    // Eliminar todas las asociaciones previas de tags, aunque no vengan nuevos
+    // 2. Actualizá Tags
     await post.setPostTags([], { transaction: editTransaction });
 
-    if (content.tags && content.tags.length > 0) {
-      // Encontrar o crear los nuevos tags
+    if (content.tags?.length > 0) {
       const tags = await Promise.all(
         content.tags.map(async (tagName) => {
           const [tag] = await Tags.findOrCreate({
@@ -194,29 +215,67 @@ Post.editPost = async (id, content) => {
         })
       );
 
-      // Asociar los nuevos tags
       await post.setPostTags(tags, { transaction: editTransaction });
     }
 
-    // Confirmar la transacción
+    // 3. Actualizá Imágenes
+    const oldImages = await post.getGallery({ transaction: editTransaction });
+
+    // Borramos todas las relaciones actuales
+    await post.setGallery([], { transaction: editTransaction });
+
+    // Creamos nuevas relaciones si hay imágenes
+    if (content.images?.length > 0) {
+      const imageInstances = await Images.findAll({
+        where: {
+          id: content.images.map((img) => img.id),
+        },
+        transaction: editTransaction,
+      });
+
+      await post.setGallery(imageInstances, { transaction: editTransaction });
+    }
+
+    // 4. Eliminamos imágenes huérfanas del post
+    const newImageIds = content.images?.map((img) => img.id) || [];
+    const imagesToRemove = oldImages.filter(
+      (oldImg) => !newImageIds.includes(oldImg.id)
+    );
+
+    for (const img of imagesToRemove) {
+      await Images.destroy({
+        where: { id: img.id },
+        force: false,
+        transaction: editTransaction,
+      });
+
+      // Opcional: eliminar de Cloudinary si tenés public_id
+      // await cloudinary.uploader.destroy(img.public_id);
+    }
+
+    // 5. Confirmamos la transacción
     await editTransaction.commit();
 
-    // Devolver el post actualizado con sus tags
-    // Por esto:
+    // 6. Retornamos el post actualizado con tags
     return await Post.findByPk(id, {
       include: [
         {
           model: Tags,
           as: "postTags",
         },
+        {
+          model: Images,
+          as: "gallery",
+          through: { attributes: ["is_featured", "order"] },
+        },
       ],
     });
   } catch (error) {
-    // Revertir cambios en caso de error
     await editTransaction.rollback();
     throw new Error("Error al editar el post: " + error.message);
   }
 };
+
 
 Post.deletePost = async (id) => {
   const post = await Post.findByPk(id);

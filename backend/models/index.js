@@ -4,6 +4,7 @@ import Comments from "./Comments.js";
 import PostTags from "./PostTags.js";
 import Images from "./Image.js";
 import Tags from "./Tags.js";
+import PostImages from './PostImages.js'
 
 // models/index.js
 Comments.belongsTo(Post, {
@@ -16,14 +17,20 @@ Post.hasMany(Comments, {
   onDelete: "CASCADE", // Permite eliminación en cascada
 });
 
-Post.hasMany(Images, {
+// En tu archivo de asociaciones (ej: models/index.js)
+Post.belongsToMany(Images, {
+  through: PostImages, // Tabla puente
   foreignKey: "post_id",
-  onDelete: "CASCADE", // Elimina imágenes relacionadas
+  otherKey: "image_id",
+  as: "gallery", // Alias opcional
+  onDelete: "CASCADE", // Elimina relaciones al borrar post
 });
 
-Images.belongsTo(Post, {
-  foreignKey: "post_id",
-  onDelete: "CASCADE", // Permite eliminación en cascada
+Images.belongsToMany(Post, {
+  through: PostImages,
+  foreignKey: "image_id",
+  otherKey: "post_id",
+  onDelete: "CASCADE", // Elimina relaciones al borrar imagen
 });
 
 PostTags.belongsTo(Post, {

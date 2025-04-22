@@ -1,10 +1,6 @@
 import LastPosts from "../../components/lastPosts";
 
 function Home() {
-  return (
-    <section>
-      <LastPosts />
-    </section>
-  );
+  return <LastPosts />;
 }
 export default Home;

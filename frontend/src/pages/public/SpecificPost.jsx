@@ -3,22 +3,11 @@ import { usePostById } from "../../api/blogApi";
 import Comments from "../../components/InsertComments";
 import styles from "./specificPost.module.css";
 import Spinner from "../../components/spinnner";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 
 function SpecificPost() {
   const { id } = useParams();
 
   const { data: post, error, isLoading } = usePostById(id);
-
-  const editor = useEditor(
-    {
-      extensions: [StarterKit],
-      content: post?.content || "", 
-      editable: false,
-    },
-    [post]
-  ); 
 
   if (isLoading) return <Spinner />;
   if (error) return <p>Error al cargar el post.</p>;
@@ -28,7 +17,10 @@ function SpecificPost() {
     <div className={styles.container}>
       <div className={styles.card}>
         <h3 className={styles.title}>{post.title}</h3>
-        {editor && <EditorContent editor={editor} className={styles.content} />}
+        <div
+          className={styles.content}
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
         <div className={styles.comments}>
           {Array.isArray(post.comments) && post.comments.length > 0 ? (
             post.comments.map((comment) => (

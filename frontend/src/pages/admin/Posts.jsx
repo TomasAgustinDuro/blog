@@ -24,17 +24,23 @@ function Posts() {
     }
   };
 
+  const getTruncatedText = (text, maxLength) => {
+    if (text.length <= maxLength) return text;
+    const cutIndex = text.indexOf(" ", maxLength);
+    return text.slice(0, cutIndex > -1 ? cutIndex : maxLength) + "...";
+  };
+  const getPlainText = (html) => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent || "";
+  };
+
   return (
     <div className={styles.postContainer}>
       {Array.isArray(dataPosts) ? (
         dataPosts.map((dato) => (
           <div key={dato.id} className={styles.postCard}>
             <h3>{dato.title}</h3>
-            <p>
-              {dato.content.length > 150
-                ? dato.content.slice(0, dato.content.indexOf(" ", 150)) + "..."
-                : dato.content}
-            </p>
+            <p>{getTruncatedText(getPlainText(dato.content), 200)}</p>
             <img src={dato.image} alt="" />
             <div>
               {Array.isArray(dato.postTags) && dato.postTags.length > 0 ? (

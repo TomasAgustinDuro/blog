@@ -6,6 +6,7 @@
   align-items: center;
 }
 
+
 .card {
   background-color: #1e1e1e;
   padding: 2rem;
@@ -28,9 +29,8 @@
   margin-bottom: 1rem;
 }
 
-.image {
-  width: 100%;
-  max-height: 400px;
+.content img{
+  width: 25%;
   object-fit: cover;
   border-radius: 12px;
   margin: 1rem 0;
@@ -75,4 +75,20 @@
 .commentText {
   font-size: 0.95rem;
   color: #ccc;
+}
+
+@media (max-width: 768px) {
+  .container{
+    border: solid 1px red;
+    padding: 1rem;
+  }
+
+  .card {
+    width: 85%;
+    margin: auto;
+  }
+
+  .card img {
+    width: 50%;
+  }
 }
