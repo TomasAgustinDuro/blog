@@ -7,6 +7,7 @@ import loginRoute from "./routes/loginRoute.js";
 import { verifyToken } from "./middleware/verifyToken.js";
 import imagesRoutes from "./routes/imagesRoutes.js";
 import sequelize from "./config/database.js";
+import dotenv from "dotenv";
 
 import cors from "cors";
 
@@ -14,7 +15,10 @@ import { Post, Tags, PostTags } from "./models/index.js";
 
 // Crear una instancia de Express
 const app = express();
-const port = 3000; // Puedes cambiar el puerto que desees
+
+dotenv.config();
+
+const port = process.env.PORT; // ✅ Sin fallback a 3000 (Render siempre inyecta el puerto)
 
 app.set("trust proxy", 1);
 
@@ -49,14 +53,13 @@ app.use("/comments", commentsRoutes);
 app.use("/tags", tagsRoutes);
 app.use("/postTags", postTagsRoutes);
 app.use("/images", imagesRoutes);
-
 // 🔁 Función principal
 const init = async () => {
   try {
     console.log("✅ Base de datos sincronizada (force: true)");
 
     app.listen(port, () => {
-      console.log(`🚀 Server running at http://localhost:${port}`);
+      console.log(`🚀 Server running on port ${port}`); // Más claro
     });
   } catch (error) {
     console.error("❌ Error al iniciar el servidor:", error.message);

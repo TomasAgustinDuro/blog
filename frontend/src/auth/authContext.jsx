@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
 
       if (!token) {
         setUser(null);
-        setLoading(false);
         return;
       }
 
@@ -34,13 +33,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      fetchUser(); // solo si hay token lo traemos
-    } else {
-      setLoading(false); // importante: que no quede colgado el loading
-    }
+    fetchUser();
   }, []);
 
   return (

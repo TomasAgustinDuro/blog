@@ -54,6 +54,7 @@ const createPosts = async (body) => {
     );
     return response.data;
   } catch (error) {
+    console.error("Error en createPosts:", error.response || error.message);
     throw new Error(error.response?.data?.message || "Error al crear el post");
   }
 };

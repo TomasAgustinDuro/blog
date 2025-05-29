@@ -64,24 +64,26 @@ Post.countAllPost = async function () {
 };
 
 Post.getPaginatedPost = async function (limit, offset) {
-  return await Post.findAll({
-    limit: limit,
-    where: offset ? { id: { [Op.gt]: offset } } : {},
-    order: [["createdAt", "DESC"]],
-    include: [
-      {
-        model: Tags,
-        as: "postTags",
-        through: { attributes: [] },
-        limit: 3,
-      },
-      {
-        model: Comments,
-        limit: 5,
-        order: [["createdAt", "DESC"]],
-      },
-    ],
-  });
+  try {
+    const posts = await Post.findAll({
+      limit: limit,
+      offset: offset,
+      include: [
+        {
+          model: Tags,
+          as: "postTags",
+          through: { attributes: [] },
+        },
+        {
+          model: Comments,
+        },
+      ],
+    });
+    console.log("posteos backend", posts);
+    return posts;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 Post.getByTag = async function (tag) {

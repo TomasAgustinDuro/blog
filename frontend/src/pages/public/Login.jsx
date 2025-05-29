@@ -16,15 +16,14 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const newUser = { user, password };
-
-    mutate(newUser, {
-      onSuccess: async (data) => {
-        localStorage.setItem("token", data.token);
-        await fetchUser(); // ahora sí el token está presente
-        navigate("/admin");
-      },
-    });
+    mutate(newUser);
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      navigate("/admin");
+    }
+  }, [isSuccess]);
 
   return (
     <form onSubmit={handleSubmit}>
