@@ -1,6 +1,6 @@
 import express from "express";
 import { PostControllers } from "../controllers/postControllers.js";
-import {verifyToken} from '../middleware/verifyToken.js'
+import { verifyToken } from "../middleware/verifyToken.js";
 
 const router = express.Router();
 

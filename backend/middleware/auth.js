@@ -1,8 +1,7 @@
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/config.js";
-
 
 dotenv.config();
 

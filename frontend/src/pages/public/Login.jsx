@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { useLoginUser } from "../../auth/auth";
 import { AuthContext } from "../../auth/authContext";
 import { useNavigate } from "react-router-dom";
-import styles from './login.module.css';
+import styles from "./login.module.css";
 
 function Login() {
   const [user, setUser] = useState("");
@@ -16,14 +16,15 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const newUser = { user, password };
-    mutate(newUser);
-  };
 
-  useEffect(() => {
-    if (isSuccess) {
-      navigate("/admin");
-    }
-  }, [isSuccess]);
+    mutate(newUser, {
+      onSuccess: async (data) => {
+        localStorage.setItem("token", data.token);
+        await fetchUser(); // ahora sí el token está presente
+        navigate("/admin");
+      },
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit}>

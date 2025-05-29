@@ -14,7 +14,7 @@ const Post = sequelize.define(
       allowNull: false,
     },
     content: {
-      type: DataTypes.TEXT("long"), 
+      type: DataTypes.TEXT("long"),
       allowNull: false,
     },
     date: {
@@ -46,7 +46,7 @@ Post.getSpecificPost = async function (id) {
       },
       {
         model: Images,
-        as: "gallery"
+        as: "gallery",
       },
     ],
   });
@@ -182,7 +182,6 @@ Post.editPost = async (id, content) => {
   const editTransaction = await sequelize.transaction();
 
   try {
-    // 1. Actualizá los campos del post
     const [updatedPost] = await Post.update(
       {
         title: content.title,
@@ -275,7 +274,6 @@ Post.editPost = async (id, content) => {
     throw new Error("Error al editar el post: " + error.message);
   }
 };
-
 
 Post.deletePost = async (id) => {
   const post = await Post.findByPk(id);

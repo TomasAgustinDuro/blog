@@ -24,7 +24,6 @@ export const usePosts = () => {
   });
 };
 
-// Paginated posts
 const fetchPaginatedPosts = async (page = 1) => {
   try {
     const response = await axios.get(
@@ -153,7 +152,7 @@ export const useDeletePost = () => {
   });
 };
 
-// Insert comment 
+// Insert comment
 const insertComment = async (body) => {
   try {
     const response = await axios.post(

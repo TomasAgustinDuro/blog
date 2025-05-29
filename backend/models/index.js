@@ -1,10 +1,9 @@
-// models/index.js
 import Post from "./Post.js";
 import Comments from "./Comments.js";
 import PostTags from "./PostTags.js";
 import Images from "./Image.js";
 import Tags from "./Tags.js";
-import PostImages from './PostImages.js'
+import PostImages from "./PostImages.js";
 
 // models/index.js
 Comments.belongsTo(Post, {
