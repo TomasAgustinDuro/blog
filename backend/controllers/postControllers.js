@@ -3,29 +3,32 @@ import { body, validationResult } from "express-validator";
 
 export class PostControllers {
   static async getAllPost(req, res) {
-    const page = parseInt(req.query.page) || 1;
-
-    const limit = 10;
-
-    const offset = (page - 1) * limit;
-
+    const transaction = await sequelize.transaction();
     try {
-      const totalPosts = await Post.countAllPost();
-      const posts = await Post.getPaginatedPost(limit, offset);
+      const page = parseInt(req.query.page) || 1;
+      const limit = 10;
+      const offset = (page - 1) * limit;
 
-      const totalPages = Math.ceil(totalPosts / limit);
+      const [totalPosts, posts] = await Promise.all([
+        Post.countAllPost({ transaction }),
+        Post.getPaginatedPost(limit, offset, { transaction }),
+      ]);
+
+      await transaction.commit();
 
       res.status(200).json({
         posts,
         pagination: {
-          currentsPage: page,
-          totalPages: totalPages,
-          totalPosts: totalPosts,
+          currentPage: page,
+          totalPages: Math.ceil(totalPosts / limit),
+          totalPosts,
           perPage: limit,
         },
       });
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      await transaction.rollback();
+      console.error("Error en /post:", error);
+      res.status(500).json({ error: "Error al obtener posts" });
     }
   }
 
