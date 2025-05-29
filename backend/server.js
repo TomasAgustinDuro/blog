@@ -39,6 +39,10 @@ app.get("/me", verifyToken, (req, res) => {
   res.json(req.user);
 });
 
+app.get("/test", (req, res) => {
+  res.send("¡Funciona!");
+});
+
 // Usar las rutas de posts
 app.use("/post", postRoutes);
 app.use("/comments", commentsRoutes);
