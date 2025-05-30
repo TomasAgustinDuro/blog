@@ -52,6 +52,8 @@ export class PostControllers {
   }
 
   static async createPost(req, res) {
+    console.log("REQ.BODY", req.body);
+
     await body("title")
       .notEmpty()
       .withMessage("Title is required")
@@ -62,7 +64,8 @@ export class PostControllers {
       .notEmpty()
       .withMessage("Content is required")
       .isString()
-      .withMessage("Content must be a string");
+      .withMessage("Content must be a string")
+      .run(req);
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -75,6 +78,8 @@ export class PostControllers {
       image_id: req.body.image_id || null,
       tags: req.body.tags || [],
     };
+
+    console.log("CONTENIDO", content);
 
     try {
       const post = await Post.createPost(content);

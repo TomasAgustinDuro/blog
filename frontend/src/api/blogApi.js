@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
+const baseURL = import.meta.env.PROD
+  ? import.meta.env.VITE_API_URL_PROD
+  : import.meta.env.VITE_API_URL_DEV;
+
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -9,7 +13,7 @@ const getAuthHeaders = () => {
 // Obtain posts
 const fetchPosts = async () => {
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}/post`);
+    const response = await axios.get(`${baseURL}/post`);
     return response.data;
   } catch (error) {
     throw new Error("Error al obtener los posts: " + error.message);
@@ -26,9 +30,7 @@ export const usePosts = () => {
 
 const fetchPaginatedPosts = async (page = 1) => {
   try {
-    const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/post?page=${page}`
-    );
+    const response = await axios.get(`${baseURL}/post?page=${page}`);
     return response.data;
   } catch (error) {
     throw new Error("Error al obtener los posts: " + error.message);
@@ -47,11 +49,9 @@ export const usePaginatedPosts = (page = 1) => {
 // Create post
 const createPosts = async (body) => {
   try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/post/create`,
-      body,
-      { headers: getAuthHeaders() }
-    );
+    const response = await axios.post(`${baseURL}/post/create`, body, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error en createPosts:", error.response || error.message);
@@ -75,11 +75,9 @@ export const useCreatePosts = () => {
 const editPosts = async (body) => {
   const id = body.id;
   try {
-    const response = await axios.put(
-      `${import.meta.env.VITE_API_URL}/post/edit/${id}`,
-      body,
-      { headers: getAuthHeaders() }
-    );
+    const response = await axios.put(`${baseURL}/post/edit/${id}`, body, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Error al editar el post");
@@ -103,9 +101,7 @@ const fetchPostById = async (id) => {
   console.log("id", id);
   try {
     console.log("id", id);
-    const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/post/${id}`
-    );
+    const response = await axios.get(`${baseURL}/post/${id}`);
     return response.data.post;
   } catch (error) {
     console.log("id", id);
@@ -126,10 +122,9 @@ export const usePostById = (id) => {
 // Delete post
 const deletePost = async (id) => {
   try {
-    const response = await axios.delete(
-      `${import.meta.env.VITE_API_URL}/post/delete/${id}`,
-      { headers: getAuthHeaders() }
-    );
+    const response = await axios.delete(`${baseURL}/post/delete/${id}`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     throw new Error(
@@ -156,10 +151,7 @@ export const useDeletePost = () => {
 // Insert comment
 const insertComment = async (body) => {
   try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/comments/create`,
-      body
-    );
+    const response = await axios.post(`${baseURL}/comments/create`, body);
     return response;
   } catch (error) {
     throw new Error(
@@ -185,10 +177,9 @@ export const useInsertComment = (postId) => {
 
 const deleteComment = async (id) => {
   try {
-    const response = await axios.delete(
-      `${import.meta.env.VITE_API_URL}/comments/delete/${id}`,
-      { headers: getAuthHeaders() }
-    );
+    const response = await axios.delete(`${baseURL}/comments/delete/${id}`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     throw new Error(

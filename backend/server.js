@@ -8,6 +8,10 @@ import { verifyToken } from "./middleware/verifyToken.js";
 import imagesRoutes from "./routes/imagesRoutes.js";
 import sequelize from "./config/database.js";
 import dotenv from "dotenv";
+import cron from "node-cron";
+import axios from "axios";
+
+// Ping cada 5 minutos
 
 import cors from "cors";
 
@@ -18,7 +22,7 @@ const app = express();
 
 dotenv.config();
 
-const port = process.env.PORT; // ✅ Sin fallback a 3000 (Render siempre inyecta el puerto)
+const port = process.env.PORT || 3000; // ✅ Sin fallback a 3000 (Render siempre inyecta el puerto)
 
 app.set("trust proxy", 1);
 
@@ -43,8 +47,8 @@ app.get("/me", verifyToken, (req, res) => {
   res.json(req.user);
 });
 
-app.get("/test", (req, res) => {
-  res.send("¡Funciona!");
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
 });
 
 // Usar las rutas de posts
@@ -57,6 +61,11 @@ app.use("/images", imagesRoutes);
 const init = async () => {
   try {
     console.log("✅ Base de datos sincronizada (force: true)");
+
+    sequelize
+      .authenticate()
+      .then(() => console.log("✅ DB CONECTADA"))
+      .catch((err) => console.error("❌ ERROR DB:", err));
 
     app.listen(port, () => {
       console.log(`🚀 Server running on port ${port}`); // Más claro

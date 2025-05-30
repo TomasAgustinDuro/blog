@@ -102,6 +102,8 @@ Post.getByTag = async function (tag) {
 Post.createPost = async (content) => {
   const transaction = await sequelize.transaction();
 
+  console.log("CONTENIDO CREATE", content);
+
   try {
     const post = await Post.create(
       {

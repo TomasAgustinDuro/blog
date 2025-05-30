@@ -16,9 +16,15 @@ router.get("/:tag", (req, res) => {
   PostControllers.getByTag(req, res);
 });
 
-router.post("/create", verifyToken, (req, res) => {
-  PostControllers.createPost(req, res);
-});
+router.post(
+  "/create",
+  (req, res, next) => {
+    console.log("🟢 Entró a /post/create");
+    next();
+  },
+  verifyToken,
+  PostControllers.createPost
+);
 
 router.put("/edit/:id", verifyToken, (req, res) => {
   PostControllers.editPost(req, res);
