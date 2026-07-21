@@ -9,7 +9,6 @@ export class ImageControllers {
 
       res.status(201).json(image);
     } catch (error) {
-      console.error("Error en insertImage:", error);
       res.status(500).json({
         error: "Error al guardar imagen",
         details: process.env.NODE_ENV === "development" ? error.message : null,

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { usePosts } from "../api/blogApi";
 import styles from "./lastPost.module.css";
-import Spinner from "./spinnner";
+import Spinner from "./Spinner";
 
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";

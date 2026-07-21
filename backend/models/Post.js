@@ -79,7 +79,6 @@ Post.getPaginatedPost = async function (limit, offset) {
         },
       ],
     });
-    console.log("posteos backend", posts);
     return posts;
   } catch (error) {
     throw new Error(error.message);
@@ -101,8 +100,6 @@ Post.getByTag = async function (tag) {
 // Métodos Post
 Post.createPost = async (content) => {
   const transaction = await sequelize.transaction();
-
-  console.log("CONTENIDO CREATE", content);
 
   try {
     const post = await Post.create(
@@ -279,7 +276,6 @@ Post.editPost = async (id, content) => {
 
 Post.deletePost = async (id) => {
   const post = await Post.findByPk(id);
-  console.log(post);
 
   if (!post) {
     throw new Error("Post no encontrado");

@@ -52,8 +52,6 @@ export class PostControllers {
   }
 
   static async createPost(req, res) {
-    console.log("REQ.BODY", req.body);
-
     await body("title")
       .notEmpty()
       .withMessage("Title is required")
@@ -78,8 +76,6 @@ export class PostControllers {
       image_id: req.body.image_id || null,
       tags: req.body.tags || [],
     };
-
-    console.log("CONTENIDO", content);
 
     try {
       const post = await Post.createPost(content);
@@ -127,7 +123,6 @@ export class PostControllers {
 
   static async deletePost(req, res) {
     const { id } = req.params;
-    console.log("id llega al servidor", id);
 
     const numericId = Number(id);
 

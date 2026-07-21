@@ -8,19 +8,20 @@ import { verifyToken } from "./middleware/verifyToken.js";
 import imagesRoutes from "./routes/imagesRoutes.js";
 import sequelize from "./config/database.js";
 import dotenv from "dotenv";
-import cron from "node-cron";
-import axios from "axios";
-
-// Ping cada 5 minutos
+import helmet from "helmet"
+import rateLimit from "express-rate-limit"
+import { errorHandler } from "./middleware/errorHandler.js";
 
 import cors from "cors";
-
-import { Post, Tags, PostTags } from "./models/index.js";
 
 // Crear una instancia de Express
 const app = express();
 
 dotenv.config();
+
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is required");
+}
 
 const port = process.env.PORT || 3000; // ✅ Sin fallback a 3000 (Render siempre inyecta el puerto)
 
@@ -39,9 +40,18 @@ app.use(
   })
 );
 
-app.use(express.json()); // Esto reemplaza body-parser
+app.use(helmet())
 
-app.use("/login", loginRoute);
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: "Too many login attempts, try again later" },
+}
+)
+
+app.use(express.json({limit: "1mb"})); 
+
+app.use("/login", loginLimiter, loginRoute);
 
 app.get("/me", verifyToken, (req, res) => {
   res.json(req.user);
@@ -75,4 +85,7 @@ const init = async () => {
   }
 };
 
+app.use(errorHandler);
+
 init();
+

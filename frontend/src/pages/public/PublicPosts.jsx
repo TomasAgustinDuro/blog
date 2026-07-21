@@ -3,7 +3,7 @@ import { usePaginatedPosts } from "../../api/blogApi";
 import styles from "./publicPosts.module.css";
 import Pagination from "../../components/pagination";
 import { useState } from "react";
-import Spinner from "../../components/spinnner";
+import Spinner from "../../components/Spinner";
 
 
 const getPlainText = (html) => {

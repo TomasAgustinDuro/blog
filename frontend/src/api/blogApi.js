@@ -1,9 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
-const baseURL = import.meta.env.PROD
-  ? import.meta.env.VITE_API_URL_PROD
-  : import.meta.env.VITE_API_URL_DEV;
+const baseURL = import.meta.env.VITE_API_URL;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -54,7 +52,6 @@ const createPosts = async (body) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error en createPosts:", error.response || error.message);
     throw new Error(error.response?.data?.message || "Error al crear el post");
   }
 };
@@ -62,12 +59,6 @@ const createPosts = async (body) => {
 export const useCreatePosts = () => {
   return useMutation({
     mutationFn: createPosts,
-    onSuccess: (data) => {
-      console.log("Post creado exitosamente", data);
-    },
-    onError: (error) => {
-      console.error("Error al crear el post", error);
-    },
   });
 };
 
@@ -87,24 +78,15 @@ const editPosts = async (body) => {
 export const useEditPost = () => {
   return useMutation({
     mutationFn: editPosts,
-    onSuccess: (data) => {
-      console.log("Post editado exitosamente", data);
-    },
-    onError: (error) => {
-      console.error("Error al editar el post", error);
-    },
   });
 };
 
 // Get post by ID
 const fetchPostById = async (id) => {
-  console.log("id", id);
   try {
-    console.log("id", id);
     const response = await axios.get(`${baseURL}/post/${id}`);
     return response.data.post;
   } catch (error) {
-    console.log("id", id);
     throw new Error(
       error.response?.data?.message || "Error al obtener el post"
     );
@@ -112,7 +94,6 @@ const fetchPostById = async (id) => {
 };
 
 export const usePostById = (id) => {
-  console.log("id use", id);
   return useQuery({
     queryKey: ["post", id],
     queryFn: () => fetchPostById(id),
@@ -138,12 +119,8 @@ export const useDeletePost = () => {
 
   return useMutation({
     mutationFn: deletePost,
-    onSuccess: (data) => {
-      console.log("Post eliminado exitosamente", data);
-      queryClient.invalidateQueries(["post"]);
-    },
-    onError: (error) => {
-      console.error("Error al eliminar el post", error);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["post"] });
     },
   });
 };
@@ -165,12 +142,8 @@ export const useInsertComment = (postId) => {
 
   return useMutation({
     mutationFn: insertComment,
-    onSuccess: (data) => {
-      console.log("Comentario creado exitosamente", data);
-      queryClient.invalidateQueries(["post", Number(postId)]); // 👈 Refresca
-    },
-    onError: (error) => {
-      console.error("Error al crear el comentario", error);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["post", Number(postId)] });
     },
   });
 };

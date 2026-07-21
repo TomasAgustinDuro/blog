@@ -18,10 +18,6 @@ router.get("/tag/:tag", (req, res) => {
 
 router.post(
   "/create",
-  (req, res, next) => {
-    console.log("🟢 Entró a /post/create");
-    next();
-  },
   verifyToken,
   PostControllers.createPost
 );

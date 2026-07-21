@@ -18,11 +18,8 @@ const loginUser = async ({ user, password }) => {
 export const useLoginUser = (fetchUser) => {
   return useMutation({
     mutationFn: loginUser,
-    onSuccess: async (data) => {
-      await fetchUser(); // 👈 ¡forzamos que actualice el user en el contexto!
-    },
-    onError: (error) => {
-      console.error("Error al iniciar sesión", error);
+    onSuccess: async () => {
+      await fetchUser();
     },
   });
 };

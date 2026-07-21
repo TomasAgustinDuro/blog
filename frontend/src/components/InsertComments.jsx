@@ -11,7 +11,6 @@ function Comments({ postId }) {
     isPending,    // en React Query v5 se llama isPending, no isPending
     isSuccess,
     isError,
-    error,
   } = useInsertComment();
 
   const handleSubmit = (e) => {
