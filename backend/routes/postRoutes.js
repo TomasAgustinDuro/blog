@@ -12,7 +12,7 @@ router.get("/:id", (req, res) => {
   PostControllers.getSpecificPost(req, res);
 });
 
-router.get("/:tag", (req, res) => {
+router.get("/tag/:tag", (req, res) => {
   PostControllers.getByTag(req, res);
 });
 

@@ -19,13 +19,13 @@ const Images = sequelize.define(
     timestamps: true,
     createdAt: "created_at",
     updatedAt: "updated_at",
-    paranoid: false, // 👈 Opcional: borrado lógico
+    paranoid: false, 
   }
 );
 
-Images.insertImage = async () => {
+Images.insertImage = async (image_url) => {
   const img = await Images.create({
-    image_url
+    image_url: image_url
   });
   return img;
 };
