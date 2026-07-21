@@ -4,12 +4,13 @@ import axios from "axios";
 
 export const MenuBar = () => {
   const { editor } = useCurrentEditor();
+   const { setImages } = useImages(); // 👈 Te traés el setter
 
   if (!editor) {
     return null;
   }
 
-  const { setImages } = useImages(); // 👈 Te traés el setter
+ 
 
   const handleImageUpload = async (e) => {
     e.preventDefault(); // 👈 esto evita que dispare el submit
@@ -20,11 +21,11 @@ export const MenuBar = () => {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "images_blog");
+    formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);  
     formData.append("folder", "blog-uploads");
 
     const res = await fetch(
-      "https://api.cloudinary.com/v1_1/dxdtyx8je/image/upload",
+      `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
       {
         method: "POST",
         body: formData,
