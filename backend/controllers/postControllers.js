@@ -1,26 +1,23 @@
-import Post from "../models/Post.js";
+import * as postRepository from "../repositories/postRepository.js";
 import { body, validationResult } from "express-validator";
 
 export class PostControllers {
   static async getAllPost(req, res) {
     const page = parseInt(req.query.page) || 1;
-
     const limit = 10;
-
     const offset = (page - 1) * limit;
 
     try {
-      const totalPosts = await Post.countAllPost();
-      const posts = await Post.getPaginatedPost(limit, offset);
-
+      const totalPosts = await postRepository.countAll();
+      const posts = await postRepository.findAllPaginated(offset, limit);
       const totalPages = Math.ceil(totalPosts / limit);
 
       res.status(200).json({
         posts,
         pagination: {
-          currentsPage: page,
-          totalPages: totalPages,
-          totalPosts: totalPosts,
+          currentPage: page,
+          totalPages,
+          totalPosts,
           perPage: limit,
         },
       });
@@ -33,7 +30,10 @@ export class PostControllers {
     const { id } = req.params;
 
     try {
-      const post = await Post.getSpecificPost(id);
+      const post = await postRepository.findByPk(Number(id));
+      if (!post) {
+        return res.status(404).json({ error: "Post not found" });
+      }
       return res.status(200).json({ post });
     } catch (error) {
       return res.status(500).json({ error: error.message });
@@ -44,8 +44,8 @@ export class PostControllers {
     const { tag } = req.params;
 
     try {
-      const post = await Post.getByTag(tag);
-      return res.status(200).json({ post });
+      const posts = await postRepository.findByTag(tag);
+      return res.status(200).json({ posts });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
@@ -73,12 +73,12 @@ export class PostControllers {
     const content = {
       title: req.body.title,
       content: req.body.content,
-      image_id: req.body.image_id || null,
       tags: req.body.tags || [],
+      images: req.body.images || [],
     };
 
     try {
-      const post = await Post.createPost(content);
+      const post = await postRepository.createPost(content);
       return res.status(201).json({ post });
     } catch (error) {
       return res.status(500).json({ error: error.message });
@@ -109,13 +109,13 @@ export class PostControllers {
     const content = {
       title: req.body.title,
       content: req.body.content,
-      image_id: req.body.image_id || null,
       tags: req.body.tags || [],
+      images: req.body.images || [],
     };
 
     try {
-      const post = await Post.editPost(id, content);
-      return res.status(201).json({ post });
+      const post = await postRepository.updatedPost(Number(id), content);
+      return res.status(200).json({ post });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
@@ -123,17 +123,15 @@ export class PostControllers {
 
   static async deletePost(req, res) {
     const { id } = req.params;
-
     const numericId = Number(id);
 
-    // Verificamos que el ID sea válido
     if (isNaN(numericId)) {
-      return res.status(400).json({ error: "ID inválido" });
+      return res.status(400).json({ error: "Invalid ID" });
     }
 
     try {
-      await Post.deletePost(id);
-      return res.status(201).json({ message: "Borrado satisfactoriamente" });
+      await postRepository.deletePost(numericId);
+      return res.status(204).send();
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }

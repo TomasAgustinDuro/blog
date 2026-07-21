@@ -1,12 +1,9 @@
 import express from "express";
 import postRoutes from "./routes/postRoutes.js"; // Asegúrate de que la ruta esté bien
 import commentsRoutes from "./routes/commentRoutes.js";
-import tagsRoutes from "./routes/tagsRoutes.js";
-import postTagsRoutes from "./routes/postTagsRoutes.js";
 import loginRoute from "./routes/loginRoute.js";
 import { verifyToken } from "./middleware/verifyToken.js";
 import imagesRoutes from "./routes/imagesRoutes.js";
-import sequelize from "./config/database.js";
 import dotenv from "dotenv";
 import helmet from "helmet"
 import rateLimit from "express-rate-limit"
@@ -64,19 +61,10 @@ app.get("/health", (req, res) => {
 // Usar las rutas de posts
 app.use("/post", postRoutes);
 app.use("/comments", commentsRoutes);
-app.use("/tags", tagsRoutes);
-app.use("/postTags", postTagsRoutes);
 app.use("/images", imagesRoutes);
 // 🔁 Función principal
 const init = async () => {
   try {
-    console.log("✅ Base de datos sincronizada (force: true)");
-
-    sequelize
-      .authenticate()
-      .then(() => console.log("✅ DB CONECTADA"))
-      .catch((err) => console.error("❌ ERROR DB:", err));
-
     app.listen(port, () => {
       console.log(`🚀 Server running on port ${port}`); // Más claro
     });
