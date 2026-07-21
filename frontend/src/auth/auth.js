@@ -18,7 +18,7 @@ const loginUser = async ({ user, password }) => {
 export const useLoginUser = (fetchUser) => {
   return useMutation({
     mutationFn: loginUser,
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       await fetchUser(); // 👈 ¡forzamos que actualice el user en el contexto!
     },
     onError: (error) => {

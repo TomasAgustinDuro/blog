@@ -3,6 +3,7 @@ import { usePostById } from "../../api/blogApi";
 import Comments from "../../components/InsertComments";
 import styles from "./specificPost.module.css";
 import Spinner from "../../components/spinnner";
+import DOMPurify from "dompurify"
 
 function SpecificPost() {
   const { id } = useParams();
@@ -19,7 +20,7 @@ function SpecificPost() {
         <h3 className={styles.title}>{post.title}</h3>
         <div
           className={styles.content}
-          dangerouslySetInnerHTML={{ __html: post.content }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content)}}
         />
         <div className={styles.comments}>
           {Array.isArray(post.comments) && post.comments.length > 0 ? (
