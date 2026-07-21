@@ -8,18 +8,11 @@ import { verifyToken } from "./middleware/verifyToken.js";
 import imagesRoutes from "./routes/imagesRoutes.js";
 import sequelize from "./config/database.js";
 import dotenv from "dotenv";
-import cron from "node-cron";
-import axios from "axios";
 import helmet from "helmet"
 import rateLimit from "express-rate-limit"
 import { errorHandler } from "./middleware/errorHandler.js";
 
-
-// Ping cada 5 minutos
-
 import cors from "cors";
-
-import { Post, Tags, PostTags } from "./models/index.js";
 
 // Crear una instancia de Express
 const app = express();
