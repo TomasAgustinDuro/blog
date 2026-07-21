@@ -193,12 +193,8 @@ export const useDeleteComment = () => {
 
   return useMutation({
     mutationFn: deleteComment,
-    onSuccess: (data) => {
-      console.log("Comment eliminado exitosamente", data);
-      queryClient.invalidateQueries(["comment"]);
-    },
-    onError: (error) => {
-      console.error("Error al eliminar el comentario", error);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["post"] });
     },
   });
 };

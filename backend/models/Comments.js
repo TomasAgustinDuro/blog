@@ -34,7 +34,7 @@ Comments.insertComment = async (content) => {
         name: content.name,
         content: content.content,
         date : new Date(),
-        post_id: 1
+        post_id: content.postId
     })
 
     return comment

@@ -8,9 +8,10 @@ function Comments({ postId }) {
 
   const {
     mutate: insertComment,
-    isLoading,
-    onSuccess,
-    onError,
+    isPending,    // en React Query v5 se llama isPending, no isPending
+    isSuccess,
+    isError,
+    error,
   } = useInsertComment();
 
   const handleSubmit = (e) => {
@@ -19,7 +20,7 @@ function Comments({ postId }) {
     const newComment = { name, content, post_id: postId };
 
     insertComment(newComment, {
-      onSuccess: () => {
+      isSuccess: () => {
         setName("");
         setContent("");
       },
@@ -41,13 +42,13 @@ function Comments({ postId }) {
         onChange={(e) => setContent(e.target.value)}
         className={styles.textarea}
       />
-      <button type="submit" disabled={isLoading} className={styles.button}>
-        {isLoading ? "Submitting..." : "Send Comment"}
+      <button type="submit" disabled={isPending} className={styles.button}>
+        {isPending ? "Submitting..." : "Send Comment"}
       </button>
 
-      {onError && <div>Error: {onError.message}</div>}
+      {isError && <div>Error: {isError.message}</div>}
 
-      {onSuccess && <div>{onSuccess.message}</div>}
+      {isSuccess && <div>{isSuccess.message}</div>}
     </form>
   );
 }
