@@ -59,7 +59,7 @@ app.get("/health", (req, res) => {
 });
 
 // Usar las rutas de posts
-app.use("/post", postRoutes);
+app.use("/posts", postRoutes);
 app.use("/comments", commentsRoutes);
 app.use("/images", imagesRoutes);
 // 🔁 Función principal

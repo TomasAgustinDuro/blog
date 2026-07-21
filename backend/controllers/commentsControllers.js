@@ -1,49 +1,29 @@
-import * as commentRepository from "../repositories/commentRepository.js";
-import { body, validationResult } from "express-validator";
+import * as commentService from "../services/commentService.js";
 
 export class CommentsControllers {
-  static async getAllComments(req, res) {
+  static async getAllComments(req, res, next) {
+    const page = parseInt(req.query.page) || 1;
+
     try {
-      const comments = await commentRepository.findAllPaginated(0, 100);
-      return res.status(200).json({ comments });
+      const result = await commentService.getAllComments(page, 100);
+      return res.status(200).json(result);
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      next(error)
     }
   }
 
-  static async getSpecificComment(req, res) {
+  static async getSpecificComment(req, res, next) {
     const { id } = req.params;
 
     try {
-      const comment = await commentRepository.getSpecificComment(Number(id));
-      if (!comment) {
-        return res.status(404).json({ error: "Comment not found" });
-      }
+      const comment = await commentService.getSpecificComment(Number(id));
       return res.status(200).json({ comment });
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      next(error)
     }
   }
 
-  static async insertComment(req, res) {
-    await body("name")
-      .notEmpty()
-      .withMessage("Name is required")
-      .isString()
-      .withMessage("Name must be a string")
-      .run(req);
-    await body("content")
-      .notEmpty()
-      .withMessage("Content is required")
-      .isString()
-      .withMessage("Content must be a string")
-      .run(req);
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ error: errors.array() });
-    }
-
+  static async insertComment(req, res, next) {
     const newComment = {
       name: req.body.name,
       content: req.body.content,
@@ -51,21 +31,21 @@ export class CommentsControllers {
     };
 
     try {
-      const comment = await commentRepository.insertComment(newComment);
+      const comment = await commentService.insertComment(newComment);
       return res.status(201).json({ comment });
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      next(error)
     }
   }
 
-  static async deleteComment(req, res) {
+  static async deleteComment(req, res, next) {
     const { id } = req.params;
 
     try {
-      await commentRepository.deleteComment(Number(id));
+      await commentService.deleteComment(Number(id));
       return res.status(204).send();
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      next(error)
     }
   }
 }
