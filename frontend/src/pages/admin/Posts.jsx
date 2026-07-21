@@ -4,8 +4,8 @@ import styles from "./adminPost.module.css";
 
 function Posts() {
   const { data, error, isLoading } = usePosts();
-  const { mutate: deletePost, onError, onSucess } = useDeletePost();
-  const { mutate: deleteComment, isError, isSucess } = useDeleteComment();
+  const { mutate: deletePost } = useDeletePost();
+  const { mutate: deleteComment } = useDeleteComment();
   const navigate = useNavigate();
 
   if (isLoading) return <div>Loading...</div>;
@@ -15,12 +15,14 @@ function Posts() {
   const dataPosts = data.posts;
 
   const handleDeletePost = (id) => {
-    deletePost(id);
+    if (confirm("¿Desea eliminar este post?")) {
+      deletePost(id);
+    }
   };
 
-  const handleDeleteComment = (id) => {
+  const handleDeleteComment = (commentId) => {
     if (confirm("¿Desea eliminar este comentario?")) {
-      deleteComment(id);
+      deleteComment(commentId);
     }
   };
 

@@ -24,7 +24,8 @@ export class CommentsControllers {
 
   static async insertComment(req, res) {
     await body('name').notEmpty().withMessage('Name is required').isString().withMessage('Name must be a string').run(req)
-    await body('content').notEmpty().withMessage('Content is required').isString().withMessage('Content must be a string')
+    await body('content').notEmpty().withMessage('Content is required').isString().withMessage('Content must be a string').run(req)
+
 
     const errors = validationResult(req);
     if(!errors.isEmpty()){
@@ -34,6 +35,7 @@ export class CommentsControllers {
     const newComment = {
       name: req.body.name,
       content: req.body.content,
+      postId: req.params.postId
     };
 
     try {

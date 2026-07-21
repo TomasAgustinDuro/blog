@@ -11,7 +11,7 @@ router.get("/", (req, res) => {
 router.get("/:id", (req, res) => {
   CommentsControllers.getSpecificComment(req, res);
 });
-router.post("/create", (req, res) => {
+router.post("/create/:postId", (req, res) => {
   CommentsControllers.insertComment(req, res);
 });
 router.delete("/delete/:id", verifyToken, (req, res) => {
