@@ -1,10 +1,10 @@
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config/config.js";
 
 dotenv.config();
 
+const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_USER = process.env.ADMIN_USER;
 const admin_password = process.env.ADMIN_PASSWORD;
 
