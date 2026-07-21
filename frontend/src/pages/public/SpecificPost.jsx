@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { usePostById } from "../../api/blogApi";
 import Comments from "../../components/InsertComments";
 import styles from "./specificPost.module.css";
-import Spinner from "../../components/spinnner";
+import Spinner from "../../components/Spinner";
 import DOMPurify from "dompurify"
 
 function SpecificPost() {

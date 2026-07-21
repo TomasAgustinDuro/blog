@@ -19,10 +19,7 @@ export const useLoginUser = (fetchUser) => {
   return useMutation({
     mutationFn: loginUser,
     onSuccess: async () => {
-      await fetchUser(); // 👈 ¡forzamos que actualice el user en el contexto!
-    },
-    onError: (error) => {
-      console.error("Error al iniciar sesión", error);
+      await fetchUser();
     },
   });
 };
