@@ -47,8 +47,6 @@ function CreatePostForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log("hola");
-
     // Creamos el nuevo post
     const newPost = {
       title,
