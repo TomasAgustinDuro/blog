@@ -3,22 +3,14 @@ import { usePosts } from "../api/blogApi";
 import styles from "./lastPost.module.css";
 import Spinner from "./Spinner";
 
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-
-const TruncatedEditor = ({ html, maxLength = 200 }) => {
-  const truncatedContent =
-    html.length > maxLength
-      ? html.slice(0, html.indexOf(" ", maxLength)) + "..."
-      : html;
-
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: truncatedContent,
-    editable: false, 
-  });
-
-  return <EditorContent editor={editor} className={styles.content} />;
+const PostPreview = ({ html, maxLength = 200 }) => {
+  const textContent =
+    new DOMParser().parseFromString(html, "text/html").body.textContent || "";
+  const truncated =
+    textContent.length > maxLength
+      ? textContent.slice(0, textContent.indexOf(" ", maxLength)) + "..."
+      : textContent;
+  return <p className={styles.content}>{truncated}</p>;
 };
 
 function LastPosts() {
@@ -41,8 +33,12 @@ function LastPosts() {
         lastPosts.map((post) => (
           <div key={post.id} className={styles.card}>
             <h3 className={styles.title}>{post.title}</h3>
-            <TruncatedEditor html={post.content} />
-            <img src={post.image} alt="" className={styles.image} />
+            <PostPreview html={post.content} />
+            <img
+              src={post.image}
+              alt={`Image for post: ${post.title}`}
+              className={styles.image}
+            />
             <div className={styles.tags}>
               {Array.isArray(post.postTags) && post.postTags.length > 0 ? (
                 post.postTags.map((tag) => (
@@ -76,4 +72,5 @@ function LastPosts() {
     </div>
   );
 }
+
 export default LastPosts;
