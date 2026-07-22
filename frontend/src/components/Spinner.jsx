@@ -1,6 +1,11 @@
-import styles from './spinner.module.css'
+import styles from "./spinner.module.css";
 
 function Spinner() {
-  return <span className={styles.spinner}></span>;
+  return (
+    <div role="status" aria-live="polite" aria-label="Loading">
+      <span className={styles.spinner}></span>
+    </div>
+  );
 }
+
 export default Spinner;

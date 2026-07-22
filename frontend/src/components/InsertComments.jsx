@@ -8,18 +8,18 @@ function Comments({ postId }) {
 
   const {
     mutate: insertComment,
-    isPending,    // en React Query v5 se llama isPending, no isPending
+    isPending,
     isSuccess,
     isError,
-  } = useInsertComment();
+  } = useInsertComment(postId);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newComment = { name, content, post_id: postId };
+    const newComment = { name, content, postId };
 
     insertComment(newComment, {
-      isSuccess: () => {
+      onSuccess: () => {
         setName("");
         setContent("");
       },
@@ -27,16 +27,20 @@ function Comments({ postId }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} aria-label="Comment form">
+      <label htmlFor="comment-name" className={styles.label}>Name</label>
       <input
+        id="comment-name"
         type="text"
-        placeholder="name"
+        placeholder="Your name"
         value={name}
         onChange={(e) => setName(e.target.value)}
         className={styles.input}
       />
+      <label htmlFor="comment-content" className={styles.label}>Comment</label>
       <textarea
-        placeholder="Content"
+        id="comment-content"
+        placeholder="Write your comment..."
         value={content}
         onChange={(e) => setContent(e.target.value)}
         className={styles.textarea}
@@ -45,9 +49,8 @@ function Comments({ postId }) {
         {isPending ? "Submitting..." : "Send Comment"}
       </button>
 
-      {isError && <div>Error: {isError.message}</div>}
-
-      {isSuccess && <div>{isSuccess.message}</div>}
+      {isError && <div role="alert">Error submitting comment</div>}
+      {isSuccess && <div role="status">Comment submitted successfully</div>}
     </form>
   );
 }
