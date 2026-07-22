@@ -30,6 +30,7 @@ function Navbar() {
             href="https://www.linkedin.com/in/tomas-duro/"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="LinkedIn profile"
           >
             <FaLinkedin className={styles.socialIcon} />
           </a>
@@ -37,6 +38,7 @@ function Navbar() {
             href="https://x.com/tommasdev"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="X (Twitter) profile"
           >
             <FaSquareXTwitter className={styles.socialIcon} />
           </a>

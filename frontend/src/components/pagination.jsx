@@ -11,6 +11,8 @@ function Pagination({ totalPages, currentPage, onPageChange }) {
           if (currentPage === 1) return;
           onPageChange(currentPage - 1);
         }}
+        disabled={currentPage === 1}
+        aria-label="Previous page"
       >
         Anterior
       </button>
@@ -35,6 +37,8 @@ function Pagination({ totalPages, currentPage, onPageChange }) {
           if (currentPage === totalPages) return;
           onPageChange(currentPage + 1);
         }}
+        disabled={currentPage === totalPages}
+        aria-label="Next page"
       >
         Siguiente
       </button>

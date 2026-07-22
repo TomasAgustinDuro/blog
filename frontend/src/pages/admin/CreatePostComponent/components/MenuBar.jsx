@@ -1,5 +1,6 @@
 import { useCurrentEditor } from "@tiptap/react";
 import { useImages } from "../../../../context/ImagesContext";
+import {fetchClient} from "../../../../api/fetchClient.js"
 import axios from "axios";
 
 export const MenuBar = () => {
@@ -38,17 +39,8 @@ export const MenuBar = () => {
     editor.chain().focus().setImage({ src: secure_url }).run();
 
     // Guardar en backend y contexto
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/images/insert`,
-      { image_url: secure_url },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        withCredentials: true,
-      }
-    );
+    const response = async (secure_url) => fetchClient(("images/", { method: "POST", body: JSON.stringify({ image_url: secure_url }) )
+
 
     const imageSaved = response.data;
 

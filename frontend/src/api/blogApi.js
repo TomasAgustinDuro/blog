@@ -1,22 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-
-const baseURL = import.meta.env.VITE_API_URL;
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+import { fetchClient } from "./fetchClient";
 
 // Obtain posts
-const fetchPosts = async () => {
-  try {
-    const response = await axios.get(`${baseURL}/post`);
-    return response.data;
-  } catch (error) {
-    throw new Error("Error al obtener los posts: " + error.message);
-  }
-};
+const fetchPosts = async () => fetchClient("/posts");
 
 export const usePosts = () => {
   return useQuery({
@@ -26,14 +12,7 @@ export const usePosts = () => {
   });
 };
 
-const fetchPaginatedPosts = async (page = 1) => {
-  try {
-    const response = await axios.get(`${baseURL}/post?page=${page}`);
-    return response.data;
-  } catch (error) {
-    throw new Error("Error al obtener los posts: " + error.message);
-  }
-};
+const fetchPaginatedPosts = async (page = 1) => fetchClient(`/posts?page=${page}`)
 
 export const usePaginatedPosts = (page = 1) => {
   return useQuery({
@@ -45,16 +24,7 @@ export const usePaginatedPosts = (page = 1) => {
 };
 
 // Create post
-const createPosts = async (body) => {
-  try {
-    const response = await axios.post(`${baseURL}/post/create`, body, {
-      headers: getAuthHeaders(),
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data?.message || "Error al crear el post");
-  }
-};
+const createPosts = async (body) => fetchClient("/posts", { method: "POST", body: JSON.stringify(body) });
 
 export const useCreatePosts = () => {
   return useMutation({
@@ -63,17 +33,7 @@ export const useCreatePosts = () => {
 };
 
 // Edit post
-const editPosts = async (body) => {
-  const id = body.id;
-  try {
-    const response = await axios.put(`${baseURL}/post/edit/${id}`, body, {
-      headers: getAuthHeaders(),
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data?.message || "Error al editar el post");
-  }
-};
+const editPosts = async (body) => fetchClient(`/${body.id}`, { method: "PUT", body: JSON.stringify(body) });
 
 export const useEditPost = () => {
   return useMutation({
@@ -82,16 +42,7 @@ export const useEditPost = () => {
 };
 
 // Get post by ID
-const fetchPostById = async (id) => {
-  try {
-    const response = await axios.get(`${baseURL}/post/${id}`);
-    return response.data.post;
-  } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "Error al obtener el post"
-    );
-  }
-};
+const fetchPostById = async (id) => fetchClient(`/${id}`, { method: "GET"})
 
 export const usePostById = (id) => {
   return useQuery({
@@ -101,18 +52,7 @@ export const usePostById = (id) => {
 };
 
 // Delete post
-const deletePost = async (id) => {
-  try {
-    const response = await axios.delete(`${baseURL}/post/delete/${id}`, {
-      headers: getAuthHeaders(),
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "Error al eliminar el post"
-    );
-  }
-};
+const deletePost = async (id) => fetchClient(`/posts/${id}`, { method: "DELETE"});
 
 export const useDeletePost = () => {
   const queryClient = useQueryClient();
@@ -126,16 +66,7 @@ export const useDeletePost = () => {
 };
 
 // Insert comment
-const insertComment = async (body) => {
-  try {
-    const response = await axios.post(`${baseURL}/comments/create`, body);
-    return response;
-  } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "Error al crear el comentario"
-    );
-  }
-};
+const insertComment = async (body) => fetchClient(`/comments/${body.postId}`, { method: "POST", body: JSON.stringify(body) });
 
 export const useInsertComment = (postId) => {
   const queryClient = useQueryClient();
@@ -148,18 +79,7 @@ export const useInsertComment = (postId) => {
   });
 };
 
-const deleteComment = async (id) => {
-  try {
-    const response = await axios.delete(`${baseURL}/comments/delete/${id}`, {
-      headers: getAuthHeaders(),
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "Error al eliminar el comentario"
-    );
-  }
-};
+const deleteComment = async (id) => fetchClient(`/comments/${id}`, { method: "DELETE"});
 
 export const useDeleteComment = () => {
   const queryClient = useQueryClient();
