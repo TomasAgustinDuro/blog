@@ -1,4 +1,4 @@
-import { PrismaClient } from "../generated/prisma"
+import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
@@ -162,5 +162,9 @@ export const countAll = async () => {
 }
 
 export const deletePost = async (id) => {
-    return await prisma.posts.delete({ where: { id: id } })
+    const numericId = Number(id)
+    await prisma.post_tags.deleteMany({ where: { post_id: numericId } })
+    await prisma.post_images.deleteMany({ where: { post_id: numericId } })
+    await prisma.comments.deleteMany({ where: { post_id: numericId } })
+    return await prisma.posts.delete({ where: { id: numericId } })
 }

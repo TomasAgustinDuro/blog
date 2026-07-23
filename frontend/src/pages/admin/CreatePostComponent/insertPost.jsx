@@ -109,7 +109,7 @@ function CreatePostForm() {
           value={currentTag}
           onChange={(e) => setCurrentTag(e.target.value)}
         />
-        <button onClick={handleAddTag}>Add Tag</button>
+        <button className={styles.secondaryButton} onClick={handleAddTag}>Add Tag</button>
       </div>
       <div className={styles.tagsContainer}>
         {tags.map((tag, index) => (
@@ -118,7 +118,7 @@ function CreatePostForm() {
           </span>
         ))}
       </div>
-      <button type="submit" disabled={isLoading}>
+      <button type="submit" disabled={isLoading} className={styles.actionButton}>
         {isLoading ? "Submitting..." : "Create Post"}
       </button>
 

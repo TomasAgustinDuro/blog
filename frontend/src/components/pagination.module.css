@@ -1,43 +1,48 @@
-/* Contenedor general */
 .paginationContainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
-  margin-top: 2rem;
-  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 3rem 0;
 }
 
-/* Estilo para los botones de página */
 .page {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  transition: all 0.15s ease;
 }
 
 .page:hover {
-  background-color: #f0f0f0;
+  border-color: var(--color-text-secondary);
+  color: var(--color-text);
 }
 
-/* Botón de página activa */
 .active {
-  background-color: #007bff;
-  color: white;
-  border-color: #007bff;
-  font-weight: bold;
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+  border-color: var(--color-accent);
 }
 
-/* Botones anterior / siguiente */
 .navButton {
   padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  transition: all 0.15s ease;
 }
 
-.navButton:hover {
-  background-color: #d6d6d6;
+.navButton:hover:not(:disabled) {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text);
+}
+
+.navButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

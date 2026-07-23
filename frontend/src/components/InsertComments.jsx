@@ -8,18 +8,18 @@ function Comments({ postId }) {
 
   const {
     mutate: insertComment,
-    isPending,    // en React Query v5 se llama isPending, no isPending
+    isPending,
     isSuccess,
     isError,
-  } = useInsertComment();
+  } = useInsertComment(postId);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newComment = { name, content, post_id: postId };
+    const newComment = { name, content, postId };
 
     insertComment(newComment, {
-      isSuccess: () => {
+      onSuccess: () => {
         setName("");
         setContent("");
       },
@@ -50,7 +50,6 @@ function Comments({ postId }) {
       </button>
 
       {isError && <div role="alert">Error submitting comment</div>}
-
       {isSuccess && <div role="status">Comment submitted successfully</div>}
     </form>
   );

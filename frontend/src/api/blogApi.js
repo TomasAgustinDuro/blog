@@ -12,7 +12,7 @@ export const usePosts = () => {
   });
 };
 
-const fetchPaginatedPosts = async (page = 1) => fetchClient(`/posts?page=${page}`)
+const fetchPaginatedPosts = async (page = 1) => fetchClient(`/posts?page=${page}`);
 
 export const usePaginatedPosts = (page = 1) => {
   return useQuery({
@@ -24,25 +24,27 @@ export const usePaginatedPosts = (page = 1) => {
 };
 
 // Create post
-const createPosts = async (body) => fetchClient("/posts", { method: "POST", body: JSON.stringify(body) });
+const createPost = async (body) =>
+  fetchClient("/posts", { method: "POST", body: JSON.stringify(body) });
 
 export const useCreatePosts = () => {
   return useMutation({
-    mutationFn: createPosts,
+    mutationFn: createPost,
   });
 };
 
 // Edit post
-const editPosts = async (body) => fetchClient(`/${body.id}`, { method: "PUT", body: JSON.stringify(body) });
+const editPost = async (body) =>
+  fetchClient(`/posts/${body.id}`, { method: "PUT", body: JSON.stringify(body) });
 
 export const useEditPost = () => {
   return useMutation({
-    mutationFn: editPosts,
+    mutationFn: editPost,
   });
 };
 
 // Get post by ID
-const fetchPostById = async (id) => fetchClient(`/${id}`, { method: "GET"})
+const fetchPostById = async (id) => fetchClient(`/posts/${id}`);
 
 export const usePostById = (id) => {
   return useQuery({
@@ -52,7 +54,8 @@ export const usePostById = (id) => {
 };
 
 // Delete post
-const deletePost = async (id) => fetchClient(`/posts/${id}`, { method: "DELETE"});
+const deletePost = async (id) =>
+  fetchClient(`/posts/${id}`, { method: "DELETE" });
 
 export const useDeletePost = () => {
   const queryClient = useQueryClient();
@@ -66,7 +69,8 @@ export const useDeletePost = () => {
 };
 
 // Insert comment
-const insertComment = async (body) => fetchClient(`/comments/${body.postId}`, { method: "POST", body: JSON.stringify(body) });
+const insertComment = async (body) =>
+  fetchClient(`/comments/${body.postId}`, { method: "POST", body: JSON.stringify(body) });
 
 export const useInsertComment = (postId) => {
   const queryClient = useQueryClient();
@@ -79,7 +83,9 @@ export const useInsertComment = (postId) => {
   });
 };
 
-const deleteComment = async (id) => fetchClient(`/comments/${id}`, { method: "DELETE"});
+// Delete comment
+const deleteComment = async (id) =>
+  fetchClient(`/comments/${id}`, { method: "DELETE" });
 
 export const useDeleteComment = () => {
   const queryClient = useQueryClient();

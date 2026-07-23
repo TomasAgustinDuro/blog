@@ -1,3 +1,44 @@
+.admin {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.admin h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 1rem;
+}
+
+.navButtons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.navButtons a {
+  text-decoration: none;
+}
+
+.navButtons button {
+  padding: 0.6rem 1.2rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.navButtons button:hover {
+  border-color: var(--color-text-secondary);
+  background-color: var(--color-border);
+}
+
 .outletContainer {
-    width: 100%;
+  width: 100%;
 }

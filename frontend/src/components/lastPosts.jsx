@@ -3,12 +3,15 @@ import { usePosts } from "../api/blogApi";
 import styles from "./lastPost.module.css";
 import Spinner from "./Spinner";
 
-
-const PostPreview = ({html, maxLength = 200}) => {
-  const textContent = new DOMParser().parseFromString(html, "text/html").body.textContent || "";
-  const truncated = textContent.length > maxLength ? textContent.slice(0, textContent.indexOf(" ", maxLength)) + "..." : textContent
+const PostPreview = ({ html, maxLength = 200 }) => {
+  const textContent =
+    new DOMParser().parseFromString(html, "text/html").body.textContent || "";
+  const truncated =
+    textContent.length > maxLength
+      ? textContent.slice(0, textContent.indexOf(" ", maxLength)) + "..."
+      : textContent;
   return <p className={styles.content}>{truncated}</p>;
-}
+};
 
 function LastPosts() {
   const { data, error, isLoading } = usePosts();
@@ -31,7 +34,11 @@ function LastPosts() {
           <div key={post.id} className={styles.card}>
             <h3 className={styles.title}>{post.title}</h3>
             <PostPreview html={post.content} />
-            <img src={post.image} alt={`Image for post: ${post.title}`} className={styles.image} />
+            <img
+              src={post.image}
+              alt={`Image for post: ${post.title}`}
+              className={styles.image}
+            />
             <div className={styles.tags}>
               {Array.isArray(post.postTags) && post.postTags.length > 0 ? (
                 post.postTags.map((tag) => (
@@ -65,4 +72,5 @@ function LastPosts() {
     </div>
   );
 }
+
 export default LastPosts;

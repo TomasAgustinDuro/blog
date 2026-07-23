@@ -7,10 +7,7 @@ function Pagination({ totalPages, currentPage, onPageChange }) {
     <div className={styles.paginationContainer}>
       <button
         className={styles.navButton}
-        onClick={() => {
-          if (currentPage === 1) return;
-          onPageChange(currentPage - 1);
-        }}
+        onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         aria-label="Previous page"
       >
@@ -25,6 +22,7 @@ function Pagination({ totalPages, currentPage, onPageChange }) {
               page === currentPage ? styles.active : ""
             }`}
             onClick={() => onPageChange(page)}
+            aria-current={page === currentPage ? "page" : undefined}
           >
             {page}
           </button>
@@ -33,10 +31,7 @@ function Pagination({ totalPages, currentPage, onPageChange }) {
 
       <button
         className={styles.navButton}
-        onClick={() => {
-          if (currentPage === totalPages) return;
-          onPageChange(currentPage + 1);
-        }}
+        onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         aria-label="Next page"
       >
@@ -46,4 +41,4 @@ function Pagination({ totalPages, currentPage, onPageChange }) {
   );
 }
 
-export default Pagination
+export default Pagination;
