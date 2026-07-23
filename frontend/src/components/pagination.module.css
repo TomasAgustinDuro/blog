@@ -23,7 +23,7 @@
 
 .active {
   background-color: var(--color-accent);
-  color: #fff;
+  color: var(--color-bg);
   border-color: var(--color-accent);
 }
 

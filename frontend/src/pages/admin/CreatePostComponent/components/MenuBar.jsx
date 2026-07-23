@@ -1,16 +1,16 @@
 import { useCurrentEditor } from "@tiptap/react";
 import { useImages } from "../../../../context/ImagesContext";
-import axios from "axios";
+import { fetchClient } from "../../../../api/fetchClient.js"
 
 export const MenuBar = () => {
   const { editor } = useCurrentEditor();
-   const { setImages } = useImages(); // 👈 Te traés el setter
+  const { setImages } = useImages(); // 👈 Te traés el setter
 
   if (!editor) {
     return null;
   }
 
- 
+
 
   const handleImageUpload = async (e) => {
     e.preventDefault(); // 👈 esto evita que dispare el submit
@@ -21,7 +21,7 @@ export const MenuBar = () => {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);  
+    formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
     formData.append("folder", "blog-uploads");
 
     const res = await fetch(
@@ -38,26 +38,18 @@ export const MenuBar = () => {
     editor.chain().focus().setImage({ src: secure_url }).run();
 
     // Guardar en backend y contexto
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/images/insert`,
-      { image_url: secure_url },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        withCredentials: true,
-      }
-    );
-
-    const imageSaved = response.data;
+    const imageSaved = await fetchClient("/images", {
+      method: "POST",
+      body: JSON.stringify({ image_url: secure_url }),
+    });
 
     setImages((prev) => [...prev, imageSaved]);
+
   };
 
   return (
     <div className="control-group">
-      <div className="button-group">
+      <div className="button-group" style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", padding: "0.75rem", background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: "var(--radius)", marginBottom: "1rem" }}>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}

@@ -1,54 +1,81 @@
 .postContainer {
   display: flex;
   flex-direction: column;
-  gap: 1em;
+  gap: 1.5rem;
 }
 
 .postCard {
-  outline: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-  padding: 1em;
-  width: 75%;
-  margin: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  transition: border-color 0.2s ease;
 }
 
 .postCard:hover {
-  /* un poco más de sombra y elevación al hacer hover */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
+  border-color: var(--color-text-secondary);
+}
+
+.postCard h3 {
+  margin-bottom: 0.5rem;
+}
+
+.postCard p {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.postCard button {
+  padding: 0.5rem 1rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-right: 0.5rem;
+  margin-top: 0.75rem;
+  transition: all 0.15s ease;
+}
+
+.postCard button:hover {
+  border-color: var(--color-text-secondary);
 }
 
 .comments {
   margin-top: 1rem;
-  background-color: #2a2a2a;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 1rem;
 }
 
 .comment {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.comment:last-child {
+  border-bottom: none;
 }
 
 .textComment {
-  width: 100%;
+  flex: 1;
 }
 
 .commentAuthor {
-  font-weight: bold;
-  margin-bottom: 0.3rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
 }
 
 .commentText {
-  font-size: 0.95rem;
-  color: #ccc;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
 }
 
-.comment button {
-  height: 10%;
-  margin:auto
+.noComments {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  font-style: italic;
 }
-
-

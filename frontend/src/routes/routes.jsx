@@ -20,38 +20,15 @@ const AppRoutes = () => {
       <Route path="/post" element={<PublicPosts />} />
       <Route path="/post/:id" element={<SpecificPost />} />
 
-      <Route path="/admin" element={<Admin />}>
-        <Route
-          path="create"
-          element={
-            <ProtectedRoutes>
-              <ImagesContextProvider>
-                <CreatePostForm />
-              </ImagesContextProvider>
-            </ProtectedRoutes>
-          }
-        />
-        <Route
-          path="edit/:id"
-          element={
-            <ProtectedRoutes>
-              <ImagesContextProvider>
-                <EditPost />
-              </ImagesContextProvider>
-            </ProtectedRoutes>
-          }
-        />
-        <Route
-          path="post"
-          element={
-            <ProtectedRoutes>
-              <Posts />
-            </ProtectedRoutes>
-          }
-        />
+      <Route path="/admin" element={
+        <ProtectedRoutes>
+          <Admin />
+        </ProtectedRoutes>
+      }>
+        <Route path="create" element={<ImagesContextProvider><CreatePostForm /></ImagesContextProvider>} />
+        <Route path="edit/:id" element={<ImagesContextProvider><EditPost /></ImagesContextProvider>} />
+        <Route path="post" element={<Posts />} />
       </Route>
-
-      <Route path="/login" element={<Login />} />
     </Routes>
   );
 };

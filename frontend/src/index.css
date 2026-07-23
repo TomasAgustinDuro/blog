@@ -43,6 +43,8 @@ a:hover {
 button {
   font-family: inherit;
   cursor: pointer;
+  border: none;
+  background: none;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -54,4 +56,32 @@ h1, h2, h3, h4, h5, h6 {
 img {
   max-width: 100%;
   height: auto;
+}
+
+/* Editor toolbar buttons */
+.button-group button {
+  padding: 0.4rem 0.7rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.button-group button:hover {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text);
+}
+
+.button-group button.is-active {
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+  border-color: var(--color-accent);
+}
+
+.button-group button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
