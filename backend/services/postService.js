@@ -5,7 +5,8 @@ const mapPostToResponse = (post) => ({
     title: post.title,
     content: post.content,
     date: post.date,
-    tags: post.post_tags?.map((pt) => ({ id: pt.tags.id, name: pt.tags.name })),
+    postTags: post.post_tags?.map((pt) => ({ id: pt.tags.id, name: pt.tags.name })) || [],
+    comments: post.comments || [],
     commentsCount: post.comments?.length ?? 0,
 });
 

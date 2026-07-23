@@ -34,11 +34,13 @@ function LastPosts() {
           <div key={post.id} className={styles.card}>
             <h3 className={styles.title}>{post.title}</h3>
             <PostPreview html={post.content} />
-            <img
-              src={post.image}
-              alt={`Image for post: ${post.title}`}
-              className={styles.image}
-            />
+            {post.image && (
+              <img
+                src={post.image}
+                alt={`Image for post: ${post.title}`}
+                className={styles.image}
+              />
+            )}
             <div className={styles.tags}>
               {Array.isArray(post.postTags) && post.postTags.length > 0 ? (
                 post.postTags.map((tag) => (

@@ -1,66 +1,50 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePostById, useEditPost } from "../../api/blogApi";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import styles from "./editPost.module.css";
-import { useNavigate } from "react-router";
-import { Color } from "@tiptap/extension-color"; // Añadido
+import { Color } from "@tiptap/extension-color";
 import { Image } from "@tiptap/extension-image";
 import TextStyle from "@tiptap/extension-text-style";
 import { EditorProvider } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { MenuBar } from "./CreatePostComponent/components/MenuBar";
-import { useImages } from "../../context/ImagesContext";
-import { useRef } from "react";
+
+const extensions = [
+  Color.configure({ types: [TextStyle.name] }),
+  TextStyle,
+  StarterKit.configure({
+    bulletList: { keepMarks: true, keepAttributes: false },
+    orderedList: { keepMarks: true, keepAttributes: false },
+    gapcursor: false,
+  }),
+  Image.configure({
+    HTMLAttributes: { class: "tiptap-image" },
+    inline: true,
+    allowBase64: false,
+  }),
+];
 
 function EditPost() {
   const { id } = useParams();
-  const { data: post } = usePostById(id);
+  const { data: postData } = usePostById(id);
+  const post = postData?.post;
   const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
-  const { images, featuredImageId } = useImages();
   const [currentTag, setCurrentTag] = useState("");
-  const { mutate, isLoading, isSuccess, isError, error, data } = useEditPost();
+  const editorRef = useRef(null);
 
-  const editorRef = useRef(null)
+  const { mutate, isPending, isSuccess, isError, error } = useEditPost();
 
-  const extensions = [
-    Color.configure({ types: [TextStyle.name] }), // Eliminado ListItem.name
-    TextStyle,
-    StarterKit.configure({
-      bulletList: {
-        keepMarks: true,
-        keepAttributes: false,
-      },
-      orderedList: {
-        keepMarks: true,
-        keepAttributes: false,
-      },
-      gapcursor: false, // 👈 Desactiva el Gapcursor integrado
-    }),
-    Image.configure({
-      HTMLAttributes: {
-        class: "tiptap-image",
-        "data-image-id": "", // Para rastrear imágenes
-      },
-      inline: true,
-      allowBase64: false,
-    }),
-  ];
-
-  // Manejar el envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const body = {
+    mutate({
       id,
       title,
-      content: editorRef.current?.getHTML(), 
+      content: editorRef.current?.getHTML() || post.content,
       tags,
-    };
-    mutate(body);
+    });
   };
 
   const handleAddTag = (e) => {
@@ -71,12 +55,13 @@ function EditPost() {
     }
   };
 
+  const handleRemoveTag = (tagToRemove) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
+
   useEffect(() => {
     if (isSuccess) {
-      const timeout = setTimeout(() => {
-        navigate("/admin/post");
-      }, 2000);
-
+      const timeout = setTimeout(() => navigate("/admin/post"), 2000);
       return () => clearTimeout(timeout);
     }
   }, [isSuccess, navigate]);
@@ -84,13 +69,11 @@ function EditPost() {
   useEffect(() => {
     if (post) {
       setTitle(post.title);
-      setTags(post.postTags.map((tag) => tag.name));
+      setTags((post.postTags || []).map((tag) => tag.name));
     }
   }, [post]);
 
-  const handleRemoveTag = (tagToRemove) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove));
-  };
+  if (!post) return <p>Loading...</p>;
 
   return (
     <form onSubmit={handleSubmit} className={styles.editContainer}>
@@ -100,23 +83,17 @@ function EditPost() {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
-      <div>
-        <EditorProvider
-          extensions={extensions}
-          key={post?.id || "default"} // 👈 Fuerza que se reinicialice
-          content={post?.content || "<p>Cargando...</p>"}
-          editorProps={{
-            attributes: {
-              class: `${styles.tiptapEditor}`,
-            },
-          }}
-          slotBefore={<MenuBar />}
-          onUpdate={({ editor }) => {
-            // Solo actualizás al enviar, no hacés setContent en cada keystroke
-            editorRef.current = editor;
-          }}
-        />
-      </div>
+
+      <EditorProvider
+        extensions={extensions}
+        key={post.id}
+        content={post.content}
+        editorProps={{ attributes: { class: styles.tiptapEditor } }}
+        slotBefore={<MenuBar />}
+        onUpdate={({ editor }) => {
+          editorRef.current = editor;
+        }}
+      />
 
       <div className={styles.tagList}>
         {tags.map((tag, index) => (
@@ -128,28 +105,27 @@ function EditPost() {
           </div>
         ))}
       </div>
+
       <input
         type="text"
-        placeholder="Tags"
+        placeholder="Add a tag"
         value={currentTag}
         onChange={(e) => setCurrentTag(e.target.value)}
       />
+
       <div className={styles.buttonGroup}>
-        <button type="button" onClick={handleAddTag}>
+        <button type="button" onClick={handleAddTag} className={styles.secondaryButton}>
           Add Tag
         </button>
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? "Submitting..." : "Edit Post"}
+        <button type="submit" disabled={isPending} className={styles.actionButton}>
+          {isPending ? "Saving..." : "Save Changes"}
         </button>
       </div>
 
       {isError && <div className={styles.error}>Error: {error.message}</div>}
-      {isSuccess && (
-        <div className={styles.success}>
-          {data?.message || "Post editado exitosamente"}
-        </div>
-      )}
+      {isSuccess && <div className={styles.success}>Post updated successfully</div>}
     </form>
   );
 }
+
 export default EditPost;

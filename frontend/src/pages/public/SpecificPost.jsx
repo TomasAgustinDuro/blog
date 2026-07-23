@@ -8,7 +8,8 @@ import DOMPurify from "dompurify"
 function SpecificPost() {
   const { id } = useParams();
 
-  const { data: post, error, isLoading } = usePostById(id);
+  const { data, error, isLoading } = usePostById(id);
+  const post = data?.post;
 
   if (isLoading) return <Spinner />;
   if (error) return <p>Error al cargar el post.</p>;
