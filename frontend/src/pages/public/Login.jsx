@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { useLoginUser } from "../../auth/auth";
 import { AuthContext } from "../../auth/authContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import styles from "./login.module.css";
 
 function Login() {
