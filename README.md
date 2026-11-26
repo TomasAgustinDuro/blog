@@ -83,6 +83,33 @@ Request → Route → Middleware (auth + validate) → Controller → Service �
 | POST | `/login` | Autenticación (devuelve JWT) |
 | GET | `/me` | Obtener usuario actual |
 
+### Formato de errores
+
+Todos los errores responden con el mismo formato. `error` es un mensaje en
+español pensado para mostrarse al usuario y nunca incluye datos internos (SQL,
+tablas, stack). `code` es estable y sirve para decidir en el frontend.
+
+```json
+{
+  "error": "El título no puede superar los 100 caracteres",
+  "code": "VALIDATION_ERROR",
+  "details": [{ "field": "title", "message": "El título no puede superar los 100 caracteres" }],
+  "timestamp": "2026-11-26T18:00:00.000Z"
+}
+```
+
+| Status | `code` | Cuándo |
+|--------|--------|--------|
+| 400 | `VALIDATION_ERROR` | Datos inválidos (`details` indica el campo) |
+| 400 | `INVALID_JSON` / `INVALID_REFERENCE` | JSON mal formado / imagen inexistente |
+| 401 | `AUTH_REQUIRED`, `TOKEN_EXPIRED`, `INVALID_TOKEN`, `INVALID_CREDENTIALS` | Sesión o login |
+| 404 | `NOT_FOUND` / `ROUTE_NOT_FOUND` | Recurso o ruta inexistente |
+| 409 | `CONFLICT` | Datos duplicados |
+| 413 | `PAYLOAD_TOO_LARGE` | Cuerpo mayor a 1 MB |
+| 429 | `TOO_MANY_REQUESTS` | Demasiados intentos (login o comentarios) |
+| 503 | `SERVICE_UNAVAILABLE` | Base de datos no disponible |
+| 500 | `INTERNAL_ERROR` | Error inesperado (el detalle queda solo en el log) |
+
 ## Setup local
 
 ### Requisitos

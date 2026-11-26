@@ -1,50 +1,75 @@
+import { useState } from "react";
 import { useCurrentEditor } from "@tiptap/react";
 import { useImages } from "../../../../context/useImages";
 import { fetchClient } from "../../../../api/fetchClient.js"
 
+const CLOUDINARY_UPLOAD_ERROR =
+  "No se pudo subir la imagen. Probá con otro archivo o intentá de nuevo más tarde.";
+
+/**
+ * Sube un archivo a Cloudinary y devuelve su URL pública.
+ *
+ * @param {File} file - Imagen elegida por el usuario.
+ * @returns {Promise<string>} URL https de la imagen subida.
+ * @throws {Error} Con un mensaje en español si la subida falla.
+ */
+const uploadToCloudinary = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+  formData.append("folder", "blog-uploads");
+
+  let uploadResponse;
+  try {
+    uploadResponse = await fetch(
+      `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      { method: "POST", body: formData }
+    );
+  } catch {
+    throw new Error(CLOUDINARY_UPLOAD_ERROR);
+  }
+
+  const uploadResult = await uploadResponse.json().catch(() => ({}));
+  if (!uploadResponse.ok || !uploadResult.secure_url) {
+    throw new Error(CLOUDINARY_UPLOAD_ERROR);
+  }
+  return uploadResult.secure_url;
+};
+
 export const MenuBar = () => {
   const { editor } = useCurrentEditor();
-  const { setImages } = useImages(); // 👈 Te traés el setter
+  const { setImages } = useImages();
+  const [uploadError, setUploadError] = useState("");
 
   if (!editor) {
     return null;
   }
 
-
-
   const handleImageUpload = async (e) => {
-    e.preventDefault(); // 👈 esto evita que dispare el submit
-    e.stopPropagation(); // 👈 y esto evita que se propague al form
+    e.preventDefault(); // evita que dispare el submit del form
+    e.stopPropagation();
 
     const file = e.target.files[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
-    formData.append("folder", "blog-uploads");
+    setUploadError("");
+    try {
+      const imageUrl = await uploadToCloudinary(file);
 
-    const res = await fetch(
-      `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
-      {
+      // La API responde { image: { id, url } }; el id se envía luego al crear el post
+      const { image } = await fetchClient("/images", {
         method: "POST",
-        body: formData,
-      }
-    );
+        body: JSON.stringify({ image_url: imageUrl }),
+      });
 
-    const data = await res.json();
-    const secure_url = data.secure_url;
-
-    editor.chain().focus().setImage({ src: secure_url }).run();
-
-    // Guardar en backend y contexto
-    const imageSaved = await fetchClient("/images", {
-      method: "POST",
-      body: JSON.stringify({ image_url: secure_url }),
-    });
-
-    setImages((prev) => [...prev, imageSaved]);
-
+      editor.chain().focus().setImage({ src: image.url }).run();
+      setImages((prev) => [...prev, image]);
+    } catch (error) {
+      setUploadError(error.message);
+    } finally {
+      // Permite volver a elegir el mismo archivo después de un error
+      e.target.value = "";
+    }
   };
 
   return (
@@ -247,6 +272,11 @@ export const MenuBar = () => {
           style={{ display: "none" }}
         />
       </div>
+      {uploadError && (
+        <p role="alert" style={{ color: "var(--color-error, #c0392b)", marginTop: 0 }}>
+          {uploadError}
+        </p>
+      )}
     </div>
   );
 };

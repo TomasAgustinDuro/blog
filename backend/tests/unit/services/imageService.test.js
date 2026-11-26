@@ -24,8 +24,11 @@ describe("insertImage", () => {
     expect(result.image).toMatchObject({ id: 2, url: "https://cdn.test/a.png" });
   });
 
-  it("throws 404 when the url is missing", async () => {
-    await expect(imageService.insertImage("")).rejects.toMatchObject({ status: 404 });
+  it("rejects a missing url with a 400", async () => {
+    await expect(imageService.insertImage("")).rejects.toMatchObject({
+      status: 400,
+      message: "Falta la URL de la imagen",
+    });
     expect(imageRepository.insertImage).not.toHaveBeenCalled();
   });
 });
@@ -39,12 +42,14 @@ describe("updateImage", () => {
     expect(imageRepository.updateImage).toHaveBeenCalledWith(2, "https://cdn.test/new.png");
   });
 
-  it("throws when id or url are missing", async () => {
+  it("rejects a missing id or url with a 400", async () => {
     await expect(imageService.updateImage(0, "u")).rejects.toMatchObject({
-      message: "ID not found",
+      status: 400,
+      message: "Falta el id de la imagen",
     });
     await expect(imageService.updateImage(2, "")).rejects.toMatchObject({
-      message: "Data not found",
+      status: 400,
+      message: "Falta la URL de la imagen",
     });
   });
 });

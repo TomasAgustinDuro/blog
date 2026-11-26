@@ -1,30 +1,35 @@
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
+import { unauthorized } from "../lib/httpError.js";
 
+/**
+ * Exige un JWT válido en el header `Authorization: Bearer <token>`.
+ *
+ * Deja el payload decodificado en `req.user`. Cada caso de rechazo tiene su
+ * propio código para que el frontend sepa si debe pedir un nuevo login.
+ */
 export const verifyToken = (req, res, next) => {
-  try {
-    const authHeader = req.headers.authorization || req.headers.Authorization;
-    if (!authHeader?.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Formato de token inválido" });
-    }
-
-    const token = authHeader.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({ message: "Token faltante" });
-    }
-
-    jwt.verify(token, env.JWT_SECRET, (err, decoded) => {
-      if (err) {
-        if (err.name === "TokenExpiredError") {
-          return res.status(401).json({ message: "Token expirado" });
-        }
-        return res.status(403).json({ message: "Token inválido" });
-      }
-
-      req.user = decoded;
-      next();
-    });
-  } catch (error) {
-    return res.status(500).json({ message: "Error interno del servidor" });
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return next(
+      unauthorized("AUTH_REQUIRED", "Necesitás iniciar sesión para realizar esta acción")
+    );
   }
+
+  const [scheme, token] = authHeader.split(" ");
+  if (scheme !== "Bearer" || !token) {
+    return next(unauthorized("INVALID_TOKEN", "El token de sesión no tiene un formato válido"));
+  }
+
+  jwt.verify(token, env.JWT_SECRET, (err, decoded) => {
+    if (err?.name === "TokenExpiredError") {
+      return next(unauthorized("TOKEN_EXPIRED", "Tu sesión expiró. Iniciá sesión nuevamente"));
+    }
+    if (err) {
+      return next(unauthorized("INVALID_TOKEN", "La sesión no es válida. Iniciá sesión nuevamente"));
+    }
+
+    req.user = decoded;
+    next();
+  });
 };

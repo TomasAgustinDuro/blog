@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { beforeAll, describe, expect, it, vi } from "vitest";
+import { HttpError } from "../../../lib/httpError.js";
 import { createMockResponse } from "../../helpers/http.js";
 
 const VALID_PASSWORD = "correct-password";
@@ -23,33 +24,35 @@ beforeAll(async () => {
 
 const attemptLogin = async (body) => {
   const response = createMockResponse();
-  await Login.loginUser({ body }, response);
-  return response;
+  const next = vi.fn();
+  await Login.loginUser({ validated: { body } }, response, next);
+  return { response, next };
 };
 
 describe("Login.loginUser", () => {
   it("returns a signed JWT for valid credentials", async () => {
-    const response = await attemptLogin({ user: "admin", password: VALID_PASSWORD });
+    const { response, next } = await attemptLogin({ user: "admin", password: VALID_PASSWORD });
 
     const { token } = response.json.mock.calls[0][0];
     expect(jwt.verify(token, "test-secret").username).toBe("admin");
+    expect(next).not.toHaveBeenCalled();
   });
 
-  it("returns the same generic message for wrong user and wrong password", async () => {
+  it("returns the same generic error for wrong user and wrong password", async () => {
     const wrongUser = await attemptLogin({ user: "other", password: VALID_PASSWORD });
     const wrongPassword = await attemptLogin({ user: "admin", password: "nope-nope" });
 
-    expect(wrongUser.status).toHaveBeenCalledWith(401);
-    expect(wrongPassword.status).toHaveBeenCalledWith(401);
-    expect(wrongUser.json.mock.calls[0]).toEqual(wrongPassword.json.mock.calls[0]);
+    const [userError] = wrongUser.next.mock.calls[0];
+    const [passwordError] = wrongPassword.next.mock.calls[0];
+    expect(userError).toMatchObject({ status: 401, code: "INVALID_CREDENTIALS" });
+    expect(passwordError.message).toBe(userError.message);
   });
 
-  it("responds 500 without leaking details when comparison fails", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => {});
+  it("forwards unexpected errors to the error handler", async () => {
+    const { next } = await attemptLogin({ user: "admin", password: undefined });
 
-    const response = await attemptLogin({ user: "admin", password: undefined });
-
-    expect(response.status).toHaveBeenCalledWith(500);
-    expect(response.json).toHaveBeenCalledWith({ error: "Internal server error" });
+    const [error] = next.mock.calls[0];
+    expect(error).toBeInstanceOf(Error);
+    expect(error).not.toBeInstanceOf(HttpError);
   });
 });
