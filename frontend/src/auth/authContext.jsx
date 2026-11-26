@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-import axios from "axios";
+import { fetchClient } from "../api/fetchClient";
 
 export const AuthContext = createContext();
 
@@ -10,20 +10,16 @@ export const AuthProvider = ({ children }) => {
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
 
-      if (!token) {
+      if (!localStorage.getItem("token")) {
         setUser(null);
         return;
       }
 
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // fetchClient adjunta el token guardado en el header Authorization
+      const currentUser = await fetchClient("/me");
 
-      setUser(res.data.username);
+      setUser(currentUser.username);
     } catch (error) {
       console.error("Error al obtener el usuario:", error);
       setUser(null);

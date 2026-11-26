@@ -10,7 +10,6 @@ import AboutMe from "../pages/public/aboutMe";
 import SpecificPost from "../pages/public/SpecificPost";
 import Admin from "../pages/admin/Admin";
 import { ImagesContextProvider } from "../context/ImagesContext";
-// import CloudinaryUploader from "../src/components/cloudinary";
 
 const AppRoutes = () => {
   return (
