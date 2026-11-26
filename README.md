@@ -86,15 +86,14 @@ Request → Route → Middleware (auth + validate) → Controller → Service �
 ## Setup local
 
 ### Requisitos
-- Node.js 18+
+- Node.js 20+ (ver `.nvmrc`)
 - PostgreSQL (remoto o local)
 
 ### Backend
 
 ```bash
 cd backend
-npm install
-npx prisma generate
+npm install   # ejecuta prisma generate automáticamente (postinstall)
 ```
 
 Crear `backend/.env`:
@@ -104,11 +103,17 @@ JWT_SECRET="un-secret-largo-y-seguro"
 PORT=3000
 ADMIN_USER="tu_usuario"
 ADMIN_PASSWORD="hash_bcrypt_del_password"
+CORS_ORIGINS="http://localhost:5173"
 ```
+
+Hay un ejemplo en `backend/.env.example`. El servidor valida estas variables al
+arrancar y falla con un mensaje claro si falta alguna. `CORS_ORIGINS` acepta
+varios orígenes separados por coma (en producción, la URL del frontend).
 
 Iniciar:
 ```bash
-node server.js
+npm run dev     # desarrollo, con recarga automática
+npm start       # producción
 ```
 
 ### Frontend

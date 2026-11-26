@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET
+import { env } from "../config/env.js";
 
 export const verifyToken = (req, res, next) => {
   try {
@@ -14,7 +13,7 @@ export const verifyToken = (req, res, next) => {
       return res.status(401).json({ message: "Token faltante" });
     }
 
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, env.JWT_SECRET, (err, decoded) => {
       if (err) {
         if (err.name === "TokenExpiredError") {
           return res.status(401).json({ message: "Token expirado" });

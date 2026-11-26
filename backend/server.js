@@ -1,10 +1,10 @@
+import { env } from "./config/env.js";
 import express from "express";
 import postRoutes from "./routes/postRoutes.js"; // Asegúrate de que la ruta esté bien
 import commentsRoutes from "./routes/commentRoutes.js";
 import loginRoute from "./routes/loginRoute.js";
 import { verifyToken } from "./middleware/verifyToken.js";
 import imagesRoutes from "./routes/imagesRoutes.js";
-import dotenv from "dotenv";
 import helmet from "helmet"
 import rateLimit from "express-rate-limit"
 import { errorHandler } from "./middleware/errorHandler.js";
@@ -14,23 +14,14 @@ import cors from "cors";
 // Crear una instancia de Express
 const app = express();
 
-dotenv.config();
-
-if (!process.env.JWT_SECRET) {
-  throw new Error("JWT_SECRET environment variable is required");
-}
-
-const port = process.env.PORT || 3000; // ✅ Sin fallback a 3000 (Render siempre inyecta el puerto)
+const port = env.PORT;
 
 app.set("trust proxy", 1);
 
 // Middleware para analizar el cuerpo de las solicitudes como JSON
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // dev local
-      "https://blog-two-kappa-21.vercel.app", // producción
-    ],
+    origin: env.CORS_ORIGINS,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],

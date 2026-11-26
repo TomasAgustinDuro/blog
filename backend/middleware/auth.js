@@ -1,12 +1,10 @@
 import bcrypt from "bcryptjs";
-import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
 
-dotenv.config();
-
-const JWT_SECRET = process.env.JWT_SECRET;
-const ADMIN_USER = process.env.ADMIN_USER;
-const admin_password = process.env.ADMIN_PASSWORD;
+const JWT_SECRET = env.JWT_SECRET;
+const ADMIN_USER = env.ADMIN_USER;
+const admin_password = env.ADMIN_PASSWORD;
 
 // Mensaje único para no revelar si falló el usuario o la contraseña
 const INVALID_CREDENTIALS_MESSAGE = "Credenciales inválidas";
