@@ -25,8 +25,8 @@ export class CommentsControllers {
 
   static async insertComment(req, res, next) {
     const newComment = {
-      name: req.body.name,
-      content: req.body.content,
+      name: req.validated.name,
+      content: req.validated.content,
       postId: Number(req.params.postId),
     };
 
