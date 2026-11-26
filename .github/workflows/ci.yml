@@ -36,7 +36,7 @@ jobs:
           VITE_API_URL: http://localhost:3000
 
   backend:
-    name: Backend (install + prisma + syntax)
+    name: Backend (install + prisma + tests)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
@@ -56,6 +56,7 @@ jobs:
       - run: npx prisma generate
         env:
           DATABASE_URL: postgresql://user:pass@localhost:5432/ci
-      # Chequeo de sintaxis hasta que existan tests automatizados.
+      # Chequeo de sintaxis rápido, antes de correr los tests.
       - name: Syntax check
         run: find . -name node_modules -prune -o -name "*.js" -print0 | xargs -0 -n1 node --check
+      - run: npm test
