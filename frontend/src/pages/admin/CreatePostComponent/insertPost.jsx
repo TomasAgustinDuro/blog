@@ -8,7 +8,7 @@ import { TextStyle } from "@tiptap/extension-text-style";
 import { EditorProvider } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { MenuBar } from "./components/MenuBar";
-import { useImages } from "../../../context/ImagesContext";
+import { useImages } from "../../../context/useImages";
 
 const extensions = [
   Color.configure({ types: [TextStyle.name] }), // Eliminado ListItem.name

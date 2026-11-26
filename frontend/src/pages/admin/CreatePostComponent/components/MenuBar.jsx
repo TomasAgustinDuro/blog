@@ -1,5 +1,5 @@
 import { useCurrentEditor } from "@tiptap/react";
-import { useImages } from "../../../../context/ImagesContext";
+import { useImages } from "../../../../context/useImages";
 import { fetchClient } from "../../../../api/fetchClient.js"
 
 export const MenuBar = () => {

@@ -1,7 +1,6 @@
-import { createContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { fetchClient } from "../api/fetchClient";
-
-export const AuthContext = createContext();
+import { AuthContext } from "./authContext";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
