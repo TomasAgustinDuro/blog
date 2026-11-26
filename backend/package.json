@@ -16,7 +16,7 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.14.1",
     "pg-hstore": "^2.3.4",
-    "prisma": "^6.19.3",
+    "prisma": "^7.10.1",
     "sequelize": "^6.37.8",
     "zod": "^4.6.6"
   }
