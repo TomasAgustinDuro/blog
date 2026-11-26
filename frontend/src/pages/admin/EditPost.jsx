@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router";
 import styles from "./editPost.module.css";
 import { Color } from "@tiptap/extension-color";
 import { Image } from "@tiptap/extension-image";
-import TextStyle from "@tiptap/extension-text-style";
+import { TextStyle } from "@tiptap/extension-text-style";
 import { EditorProvider } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { MenuBar } from "./CreatePostComponent/components/MenuBar";

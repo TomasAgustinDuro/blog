@@ -4,7 +4,7 @@ import styles from "./insertPost.module.css";
 import { useNavigate } from "react-router";
 import { Color } from "@tiptap/extension-color"; // Añadido
 import { Image } from "@tiptap/extension-image";
-import TextStyle from "@tiptap/extension-text-style";
+import { TextStyle } from "@tiptap/extension-text-style";
 import { EditorProvider } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { MenuBar } from "./components/MenuBar";
