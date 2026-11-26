@@ -1,7 +1,7 @@
 import * as imageService from "../services/imageService.js";
 
 export class ImageControllers {
-  static async insertImage(req, res) {
+  static async insertImage(req, res, next) {
     try {
       const { image_url } = req.body;
 
@@ -28,8 +28,8 @@ export class ImageControllers {
     const { id } = req.params;
 
     try {
-      const result = await imageService.deleteImage(id);
-      return res.status(204).json(result);
+      await imageService.deleteImage(Number(id));
+      return res.status(204).send();
     } catch (error) {
       next(error)
     }

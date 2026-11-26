@@ -41,21 +41,17 @@ export const getSpecificPost = async (id) => {
     return { post: mapPostToResponse(post) };
 }
 
-export const getByTag = async (tag) => {
+export const getByTag = async (tag, page = 1, limit = 10) => {
     if (!tag) {
         const error = new Error("Tag not found");
         error.status = 404;
         throw error;
     }
 
-    const post = await postRepository.findByTag(tag)
+    const offset = (page - 1) * limit;
+    const posts = await postRepository.findByTag(tag, offset, limit)
 
-    if (!post) {
-        const error = new Error("Post not found");
-        error.status = 404;
-        throw error;
-    }
-    return { post: posts.map(mapPostToResponse) };
+    return { posts: posts.map(mapPostToResponse) };
 }
 
 export const createPost = async (data) => {

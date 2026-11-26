@@ -5,5 +5,6 @@ export const commentSchema = z.object({
     content: z
         .string()
         .min(1, "El comentario no puede estar vacío")
-        .max(500, "Máximo 500 caracteres"),
+        // Coincide con la columna comments.content (VarChar(255))
+        .max(255, "Máximo 255 caracteres"),
 })

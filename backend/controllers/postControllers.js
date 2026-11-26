@@ -1,14 +1,15 @@
 import * as postService from "../services/postService.js";
 
+const POSTS_PER_PAGE = 10;
 
 export class PostControllers {
   static async getAllPost(req, res, next) {
     const page = parseInt(req.query.page) || 1;
 
     try {
-      const result = await postService.getAllPost(page, 10)
+      const result = await postService.getAllPost(page, POSTS_PER_PAGE)
 
-      res.status(201).json(result);
+      res.status(200).json(result);
     } catch (error) {
       next(error)
     }
@@ -27,9 +28,10 @@ export class PostControllers {
 
   static async getByTag(req, res, next) {
     const { tag } = req.params;
+    const page = parseInt(req.query.page) || 1;
 
     try {
-      const result = await postService.getByTag(tag)
+      const result = await postService.getByTag(tag, page, POSTS_PER_PAGE)
       return res.status(200).json(result);
     } catch (error) {
       next(error)
@@ -37,17 +39,12 @@ export class PostControllers {
   }
 
   static async createPost(req, res, next) {
-
-    const content = {
-      title: req.body.title,
-      content: req.body.content,
-      tags: req.body.tags || [],
-      images: req.body.images || [],
-    };
+    // Datos ya validados y depurados por el middleware de Zod
+    const { title, content, tags = [], images = [] } = req.validated;
 
     try {
-      const result = await postService.createPost(content);
-      return res.status(200).json(result);
+      const result = await postService.createPost({ title, content, tags, images });
+      return res.status(201).json(result);
     } catch (error) {
       next(error)
     }
@@ -55,16 +52,15 @@ export class PostControllers {
 
   static async editPost(req, res, next) {
     const { id } = req.params;
-
-    const content = {
-      title: req.body.title,
-      content: req.body.content,
-      tags: req.body.tags || [],
-      images: req.body.images || [],
-    };
+    const { title, content, tags = [], images = [] } = req.validated;
 
     try {
-      const result = await postService.updatePost(Number(id), content);
+      const result = await postService.updatePost(Number(id), {
+        title,
+        content,
+        tags,
+        images,
+      });
       return res.status(200).json(result);
     } catch (error) {
       next(error)

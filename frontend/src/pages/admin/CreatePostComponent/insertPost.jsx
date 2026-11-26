@@ -42,7 +42,7 @@ function CreatePostForm() {
   const { images } = useImages();
   const navigate = useNavigate();
 
-  const { mutate, isLoading, isSuccess, isError, error } = useCreatePosts();
+  const { mutate, isPending, isSuccess, isError, error } = useCreatePosts();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -118,8 +118,8 @@ function CreatePostForm() {
           </span>
         ))}
       </div>
-      <button type="submit" disabled={isLoading} className={styles.actionButton}>
-        {isLoading ? "Submitting..." : "Create Post"}
+      <button type="submit" disabled={isPending} className={styles.actionButton}>
+        {isPending ? "Submitting..." : "Create Post"}
       </button>
 
       {isSuccess && (
