@@ -1,5 +1,11 @@
-# Configuración de Dependabot: PRs hacia develop, agrupados y sin saltos de
-# versión mayor de Prisma (se migrará a mano, ver docs del proyecto).
+# Configuración de Dependabot.
+#
+# - Una vez por mes, un único PR por carpeta con las actualizaciones
+#   minor/patch agrupadas (más una para las GitHub Actions).
+# - Los saltos de versión mayor se ignoran: se hacen a mano, en una rama
+#   propia (ejemplos: Prisma 7, Express 5, Vite 8, ESLint 10).
+# - Las actualizaciones de seguridad NO se ven afectadas por `ignore` ni por
+#   el calendario: siguen llegando como PRs aparte.
 version: 2
 
 updates:
@@ -7,9 +13,8 @@ updates:
     directory: "/frontend"
     target-branch: "develop"
     schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
+      interval: "monthly"
+    open-pull-requests-limit: 3
     commit-message:
       prefix: "build(deps)"
     groups:
@@ -22,14 +27,16 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "npm"
     directory: "/backend"
     target-branch: "develop"
     schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
+      interval: "monthly"
+    open-pull-requests-limit: 3
     commit-message:
       prefix: "build(deps)"
     groups:
@@ -43,10 +50,8 @@ updates:
           - "minor"
           - "patch"
     ignore:
-      # Prisma 7 requiere migración manual (generador, adapter y config).
-      - dependency-name: "prisma"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@prisma/*"
+      # Incluye Prisma 7, que requiere migración manual (generador, adapter).
+      - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
@@ -54,5 +59,10 @@ updates:
     target-branch: "develop"
     schedule:
       interval: "monthly"
+    open-pull-requests-limit: 2
     commit-message:
       prefix: "build(ci)"
+    groups:
+      actions:
+        patterns:
+          - "*"
