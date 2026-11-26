@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router, useLocation } from "react-router";
 import "./App.css";
-import { AuthProvider } from "./auth/authContext";
+import { AuthProvider } from "./auth/AuthProvider";
 import AppRoutes from "./routes/routes";
 import Navbar from "./components/navbar";
 
