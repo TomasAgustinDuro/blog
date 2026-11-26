@@ -1,0 +1,58 @@
+# Configuración de Dependabot: PRs hacia develop, agrupados y sin saltos de
+# versión mayor de Prisma (se migrará a mano, ver docs del proyecto).
+version: 2
+
+updates:
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    target-branch: "develop"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "build(deps)"
+    groups:
+      # TipTap y ProseMirror deben subir juntos para no romper el editor.
+      editor:
+        patterns:
+          - "@tiptap/*"
+          - "prosemirror-*"
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    target-branch: "develop"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "build(deps)"
+    groups:
+      # prisma y @prisma/client siempre deben tener la misma versión.
+      prisma:
+        patterns:
+          - "prisma"
+          - "@prisma/*"
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # Prisma 7 requiere migración manual (generador, adapter y config).
+      - dependency-name: "prisma"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@prisma/*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "develop"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "build(ci)"

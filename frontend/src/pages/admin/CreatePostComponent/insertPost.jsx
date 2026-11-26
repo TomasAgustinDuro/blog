@@ -39,7 +39,7 @@ function CreatePostForm() {
   const [content, setContent] = useState("<p>¡Escribe aquí tu contenido!</p>");
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState("");
-  const { images, featuredImageId } = useImages();
+  const { images } = useImages();
   const navigate = useNavigate();
 
   const { mutate, isLoading, isSuccess, isError, error } = useCreatePosts();
