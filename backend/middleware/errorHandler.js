@@ -5,6 +5,13 @@
  * los detalles internos en errores inesperados.
  */
 export const errorHandler = (err, req, res, next) => {
+    // P2025: Prisma no encontró el registro a actualizar o borrar
+    const isRecordNotFound = err.code === "P2025";
+    if (isRecordNotFound) {
+        err.status = 404;
+        err.message = "Resource not found";
+    }
+
     const status = err.status || 500;
     const isClientError = status >= 400 && status < 500;
 

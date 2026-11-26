@@ -15,5 +15,13 @@
     "jsonwebtoken": "^9.0.2",
     "prisma": "^6.19.3",
     "zod": "^4.6.6"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "postinstall": "prisma generate"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
