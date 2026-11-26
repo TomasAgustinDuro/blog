@@ -14,43 +14,40 @@ const buildRequest = (authorization) => ({
 const signToken = (options = {}) =>
   jwt.sign({ username: "admin" }, TEST_SECRET, { expiresIn: "5m", ...options });
 
+const rejectionOf = async (request) => {
+  const { next } = await runMiddleware(verifyToken, request);
+  return next.mock.calls[0][0];
+};
+
 describe("verifyToken", () => {
-  it("rejects requests without Authorization header", async () => {
-    const { response, next } = await runMiddleware(verifyToken, buildRequest());
+  it("asks to log in when there is no Authorization header", async () => {
+    const error = await rejectionOf(buildRequest());
 
-    expect(response.status).toHaveBeenCalledWith(401);
-    expect(next).not.toHaveBeenCalled();
+    expect(error).toMatchObject({ status: 401, code: "AUTH_REQUIRED" });
   });
 
-  it("rejects headers that are not Bearer tokens", async () => {
-    const request = buildRequest("Basic abc123");
+  it.each(["Basic abc123", "Bearer", "Bearer "])(
+    "rejects the malformed header %j",
+    async (header) => {
+      const error = await rejectionOf(buildRequest(header));
 
-    const { response } = await runMiddleware(verifyToken, request);
-
-    expect(response.status).toHaveBeenCalledWith(401);
-  });
+      expect(error).toMatchObject({ status: 401, code: "INVALID_TOKEN" });
+    }
+  );
 
   it("rejects a token signed with another secret", async () => {
     const forgedToken = jwt.sign({ username: "admin" }, "other-secret");
 
-    const { response } = await runMiddleware(
-      verifyToken,
-      buildRequest(`Bearer ${forgedToken}`)
-    );
+    const error = await rejectionOf(buildRequest(`Bearer ${forgedToken}`));
 
-    expect(response.status).toHaveBeenCalledWith(403);
+    expect(error).toMatchObject({ status: 401, code: "INVALID_TOKEN" });
   });
 
-  it("rejects expired tokens with a specific message", async () => {
-    const expiredToken = signToken({ expiresIn: -10 });
+  it("tells the user that the session expired", async () => {
+    const error = await rejectionOf(buildRequest(`Bearer ${signToken({ expiresIn: -10 })}`));
 
-    const { response } = await runMiddleware(
-      verifyToken,
-      buildRequest(`Bearer ${expiredToken}`)
-    );
-
-    expect(response.status).toHaveBeenCalledWith(401);
-    expect(response.json).toHaveBeenCalledWith({ message: "Token expirado" });
+    expect(error).toMatchObject({ status: 401, code: "TOKEN_EXPIRED" });
+    expect(error.message).toMatch(/sesión expiró/);
   });
 
   it("accepts a valid token and exposes the user in req.user", async () => {
@@ -58,7 +55,7 @@ describe("verifyToken", () => {
 
     const { next } = await runMiddleware(verifyToken, request);
 
-    expect(next).toHaveBeenCalledOnce();
+    expect(next).toHaveBeenCalledWith();
     expect(request.user.username).toBe("admin");
   });
 });

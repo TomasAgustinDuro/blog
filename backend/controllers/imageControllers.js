@@ -1,37 +1,34 @@
 import * as imageService from "../services/imageService.js";
 
+// Los datos de req.validated ya pasaron por los schemas de Zod de cada ruta
 export class ImageControllers {
   static async insertImage(req, res, next) {
     try {
-      const { image_url } = req.body;
-
-      const image = await imageService.insertImage(image_url);
-      return res.status(201).json(image);
+      const result = await imageService.insertImage(req.validated.body.image_url);
+      return res.status(201).json(result);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
   static async updateImage(req, res, next) {
-    const { id } = req.params;
-    const { image_url } = req.body;
-
     try {
-      const result = await imageService.updateImage(Number(id), image_url);
+      const result = await imageService.updateImage(
+        req.validated.params.id,
+        req.validated.body.image_url
+      );
       return res.status(200).json(result);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
   static async deleteImage(req, res, next) {
-    const { id } = req.params;
-
     try {
-      await imageService.deleteImage(Number(id));
+      await imageService.deleteImage(req.validated.params.id);
       return res.status(204).send();
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 }

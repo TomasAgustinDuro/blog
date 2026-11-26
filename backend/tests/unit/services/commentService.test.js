@@ -34,17 +34,26 @@ describe("getAllComments", () => {
 });
 
 describe("getSpecificComment", () => {
+  it("returns a single level { comment } object", async () => {
+    commentRepository.getSpecificComment.mockResolvedValue(dbComment);
+
+    const result = await commentService.getSpecificComment(5);
+
+    expect(result).toEqual({ comment: expect.objectContaining({ id: 5 }) });
+  });
+
   it("throws 404 when the comment does not exist", async () => {
     commentRepository.getSpecificComment.mockResolvedValue(null);
 
     await expect(commentService.getSpecificComment(9)).rejects.toMatchObject({
       status: 404,
+      message: "El comentario no existe",
     });
   });
 
-  it("throws 404 when no id is provided", async () => {
+  it("rejects a missing id with a 400", async () => {
     await expect(commentService.getSpecificComment(0)).rejects.toMatchObject({
-      message: "ID not found",
+      status: 400,
     });
   });
 });
@@ -53,14 +62,14 @@ describe("insertComment / deleteComment", () => {
   it("inserts a comment and returns it mapped", async () => {
     commentRepository.insertComment.mockResolvedValue(dbComment);
 
-    const result = await commentService.insertComment({ name: "Ana", content: "x" });
+    const result = await commentService.insertComment({ name: "Ana", content: "x", postId: 1 });
 
     expect(result.comment.id).toBe(5);
   });
 
-  it("throws when no data is provided", async () => {
+  it("rejects missing data with a 400", async () => {
     await expect(commentService.insertComment(undefined)).rejects.toMatchObject({
-      status: 404,
+      status: 400,
     });
   });
 

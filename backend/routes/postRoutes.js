@@ -1,25 +1,36 @@
 import express from "express";
 import { PostControllers } from "../controllers/postControllers.js";
 import { verifyToken } from "../middleware/verifyToken.js";
-import {validateSchema} from "../middleware/validate.js"
-import {postSchema} from "../schemas/postSchemas.js"
+import { validateSchema } from "../middleware/validate.js";
+import { postSchema } from "../schemas/postSchemas.js";
+import {
+  idParamSchema,
+  paginationQuerySchema,
+  tagParamSchema,
+} from "../schemas/requestSchemas.js";
 
 const router = express.Router();
 
-router.get("/", PostControllers.getAllPost);
-router.get("/:id", PostControllers.getSpecificPost);
-router.get("/tag/:tag", PostControllers.getByTag);
+const validatePage = validateSchema(paginationQuerySchema, "query");
+const validateId = validateSchema(idParamSchema, "params");
 
-router.post(
-  "/",
-  verifyToken,
-  validateSchema(postSchema),
-  PostControllers.createPost
+router.get("/", validatePage, PostControllers.getAllPost);
+router.get("/:id", validateId, PostControllers.getSpecificPost);
+router.get(
+  "/tag/:tag",
+  validateSchema(tagParamSchema, "params"),
+  validatePage,
+  PostControllers.getByTag
 );
 
-router.put("/:id", verifyToken, validateSchema(postSchema),PostControllers.editPost);
-
-router.delete("/:id", verifyToken,
-  PostControllers.deletePost);
+router.post("/", verifyToken, validateSchema(postSchema), PostControllers.createPost);
+router.put(
+  "/:id",
+  verifyToken,
+  validateId,
+  validateSchema(postSchema),
+  PostControllers.editPost
+);
+router.delete("/:id", verifyToken, validateId, PostControllers.deletePost);
 
 export default router;

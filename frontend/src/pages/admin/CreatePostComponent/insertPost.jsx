@@ -9,6 +9,7 @@ import { EditorProvider } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { MenuBar } from "./components/MenuBar";
 import { useImages } from "../../../context/useImages";
+import { POST_TITLE_MAX_LENGTH, TAG_MAX_LENGTH } from "../../../constants/validationLimits";
 
 const extensions = [
   Color.configure({ types: [TextStyle.name] }), // Eliminado ListItem.name
@@ -83,8 +84,12 @@ function CreatePostForm() {
         type="text"
         placeholder="Title"
         value={title}
+        maxLength={POST_TITLE_MAX_LENGTH}
         onChange={(e) => setTitle(e.target.value)}
       />
+      <small>
+        {title.length}/{POST_TITLE_MAX_LENGTH} caracteres
+      </small>
 
       <div>
         <EditorProvider
@@ -107,6 +112,7 @@ function CreatePostForm() {
           type="text"
           placeholder="Add a tag"
           value={currentTag}
+          maxLength={TAG_MAX_LENGTH}
           onChange={(e) => setCurrentTag(e.target.value)}
         />
         <button className={styles.secondaryButton} onClick={handleAddTag}>Add Tag</button>
@@ -125,7 +131,7 @@ function CreatePostForm() {
       {isSuccess && (
         <div className={styles.success}>{"Post creado exitosamente"}</div>
       )}
-      {isError && <div className={styles.error}>Error: {error.message}</div>}
+      {isError && <div className={styles.error} role="alert">{error.message}</div>}
     </form>
   );
 }

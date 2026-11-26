@@ -1,24 +1,25 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
+import { unauthorized } from "../lib/httpError.js";
 
 const JWT_SECRET = env.JWT_SECRET;
 const ADMIN_USER = env.ADMIN_USER;
-const admin_password = env.ADMIN_PASSWORD;
+const ADMIN_PASSWORD_HASH = env.ADMIN_PASSWORD;
 
 // Mensaje único para no revelar si falló el usuario o la contraseña
-const INVALID_CREDENTIALS_MESSAGE = "Credenciales inválidas";
+const INVALID_CREDENTIALS_MESSAGE = "Usuario o contraseña incorrectos";
 
 export class Login {
-  static async loginUser(req, res) {
-    const { user, password } = req.body;
+  static async loginUser(req, res, next) {
+    const { user, password } = req.validated.body;
 
     try {
       // Se compara siempre el hash para no filtrar por tiempos de respuesta
-      const isPasswordValid = await bcrypt.compare(password, admin_password);
+      const isPasswordValid = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
 
       if (user !== ADMIN_USER || !isPasswordValid) {
-        return res.status(401).json({ message: INVALID_CREDENTIALS_MESSAGE });
+        return next(unauthorized("INVALID_CREDENTIALS", INVALID_CREDENTIALS_MESSAGE));
       }
 
       const token = jwt.sign({ username: user }, JWT_SECRET, {
@@ -27,8 +28,7 @@ export class Login {
 
       res.json({ token });
     } catch (error) {
-      console.error("Error al hacer login:", error);
-      return res.status(500).json({ error: "Internal server error" });
+      next(error);
     }
   }
 }

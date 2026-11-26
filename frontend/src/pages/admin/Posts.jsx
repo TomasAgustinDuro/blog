@@ -14,15 +14,18 @@ function Posts() {
 
   const dataPosts = data.posts;
 
+  // Sin esto, un borrado fallido no mostraba nada al usuario
+  const showDeleteError = (deleteError) => alert(deleteError.message);
+
   const handleDeletePost = (id) => {
     if (confirm("¿Desea eliminar este post?")) {
-      deletePost(id);
+      deletePost(id, { onError: showDeleteError });
     }
   };
 
   const handleDeleteComment = (commentId) => {
     if (confirm("¿Desea eliminar este comentario?")) {
-      deleteComment(commentId);
+      deleteComment(commentId, { onError: showDeleteError });
     }
   };
 

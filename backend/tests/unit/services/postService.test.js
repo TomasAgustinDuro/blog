@@ -22,7 +22,7 @@ const buildDbPost = (overrides = {}) => ({
   ...overrides,
 });
 
-const expectStatus = async (promise, status, message) => {
+const expectHttpError = async (promise, status, message) => {
   await expect(promise).rejects.toMatchObject({ status, message });
 };
 
@@ -69,7 +69,7 @@ describe("getSpecificPost", () => {
   it("returns the mapped post when it exists", async () => {
     postRepository.findByPk.mockResolvedValue(buildDbPost());
 
-    const result = await postService.getSpecificPost("1");
+    const result = await postService.getSpecificPost(1);
 
     expect(postRepository.findByPk).toHaveBeenCalledWith(1);
     expect(result.post.title).toBe("Title");
@@ -78,11 +78,11 @@ describe("getSpecificPost", () => {
   it("throws 404 when the post does not exist", async () => {
     postRepository.findByPk.mockResolvedValue(null);
 
-    await expectStatus(postService.getSpecificPost("99"), 404, "Post not found");
+    await expectHttpError(postService.getSpecificPost(99), 404, "El post no existe");
   });
 
-  it("throws 404 when no id is provided", async () => {
-    await expectStatus(postService.getSpecificPost(undefined), 404, "ID not found");
+  it("rejects a missing id with a 400", async () => {
+    await expectHttpError(postService.getSpecificPost(undefined), 400, "Falta el id del post");
   });
 });
 
@@ -99,13 +99,11 @@ describe("getByTag", () => {
   it("returns an empty list when no post has the tag", async () => {
     postRepository.findByTag.mockResolvedValue([]);
 
-    const result = await postService.getByTag("unknown");
-
-    expect(result.posts).toEqual([]);
+    expect((await postService.getByTag("unknown")).posts).toEqual([]);
   });
 
-  it("throws 404 when the tag is empty", async () => {
-    await expectStatus(postService.getByTag(""), 404, "Tag not found");
+  it("rejects an empty tag with a 400", async () => {
+    await expectHttpError(postService.getByTag(""), 400, "Falta el nombre del tag");
   });
 });
 
@@ -118,41 +116,36 @@ describe("createPost / updatePost / deletePost", () => {
     expect(result.post.id).toBe(1);
   });
 
-  it("throws when creation returns nothing", async () => {
-    postRepository.createPost.mockResolvedValue(null);
-
-    await expectStatus(postService.createPost({ title: "T" }), 404, "Something was wrong");
+  it("rejects createPost without data", async () => {
+    await expectHttpError(postService.createPost(undefined), 400, "Faltan los datos del post");
   });
 
-  it("throws when createPost receives no data", async () => {
-    await expectStatus(postService.createPost(undefined), 404, "Data not found");
-  });
-
-  it("updates a post through the repository", async () => {
+  it("passes undefined tags and images through so they are kept", async () => {
     postRepository.updatedPost.mockResolvedValue(buildDbPost({ title: "New" }));
+    const changes = { title: "New", content: "x", tags: undefined, images: undefined };
 
-    const result = await postService.updatePost(1, { title: "New" });
+    const result = await postService.updatePost(1, changes);
 
-    expect(postRepository.updatedPost).toHaveBeenCalledWith(1, { title: "New" });
+    expect(postRepository.updatedPost).toHaveBeenCalledWith(1, changes);
     expect(result.post.title).toBe("New");
   });
 
-  it("throws when updating without id or data", async () => {
-    await expectStatus(postService.updatePost(undefined, {}), 404, "ID not found");
-    await expectStatus(postService.updatePost(1, undefined), 404, "Data not found");
+  it("rejects updates without id or data", async () => {
+    await expectHttpError(postService.updatePost(undefined, {}), 400, "Falta el id del post");
+    await expectHttpError(postService.updatePost(1, undefined), 400, "Faltan los datos del post");
   });
 
   it("deletes a post and returns the removed one", async () => {
     postRepository.deletePost.mockResolvedValue(buildDbPost({ post_tags: undefined }));
 
-    const result = await postService.deletePost("1");
+    const result = await postService.deletePost(1);
 
     expect(result.post.postTags).toEqual([]);
   });
 
-  it("lets repository errors bubble up", async () => {
-    postRepository.deletePost.mockRejectedValue(new Error("db down"));
+  it("lets repository errors bubble up (e.g. P2025 when the post does not exist)", async () => {
+    postRepository.deletePost.mockRejectedValue(Object.assign(new Error("x"), { code: "P2025" }));
 
-    await expect(postService.deletePost("1")).rejects.toThrow("db down");
+    await expect(postService.deletePost(1)).rejects.toMatchObject({ code: "P2025" });
   });
 });
