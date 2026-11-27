@@ -1,3 +1,4 @@
+import { badRequest } from "../lib/httpError.js";
 import * as imageRepository from "../repositories/imageRepository.js";
 
 const mapImageToResponse = (image) => ({
@@ -7,61 +8,25 @@ const mapImageToResponse = (image) => ({
     updated_at: image.updated_at
 })
 
+// Si la imagen no existe, Prisma lanza P2025 y errorHandler responde 404
 export const insertImage = async (url) => {
-    if (!url) {
-        const error = new Error("Data not found");
-        error.status = 404;
-        throw error;
-    }
+    if (!url) throw badRequest("Falta la URL de la imagen");
 
     const image = await imageRepository.insertImage(url)
-
-    if (!image) {
-        const error = new Error("Something was wrong");
-        error.status = 404;
-        throw error;
-    }
     return { image: mapImageToResponse(image) };
 }
 
 export const updateImage = async (id, url) => {
-    if (!id) {
-        const error = new Error("ID not found");
-        error.status = 404;
-        throw error;
-    }
-
-
-    if (!url) {
-        const error = new Error("Data not found");
-        error.status = 404;
-        throw error;
-    }
+    if (!id) throw badRequest("Falta el id de la imagen");
+    if (!url) throw badRequest("Falta la URL de la imagen");
 
     const image = await imageRepository.updateImage(id, url)
-
-    if (!image) {
-        const error = new Error("Something was wrong");
-        error.status = 404;
-        throw error;
-    }
     return { image: mapImageToResponse(image) };
-
 }
 
 export const deleteImage = async (id) => {
-    if (!id) {
-        const error = new Error("ID not found");
-        error.status = 404;
-        throw error;
-    }
+    if (!id) throw badRequest("Falta el id de la imagen");
 
     const image = await imageRepository.deleteImage(id)
-
-    if (!image) {
-        const error = new Error("Something was wrong");
-        error.status = 404;
-        throw error;
-    }
     return { image: mapImageToResponse(image) };
 }

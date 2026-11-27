@@ -83,18 +83,44 @@ Request → Route → Middleware (auth + validate) → Controller → Service �
 | POST | `/login` | Autenticación (devuelve JWT) |
 | GET | `/me` | Obtener usuario actual |
 
+### Formato de errores
+
+Todos los errores responden con el mismo formato. `error` es un mensaje en
+español pensado para mostrarse al usuario y nunca incluye datos internos (SQL,
+tablas, stack). `code` es estable y sirve para decidir en el frontend.
+
+```json
+{
+  "error": "El título no puede superar los 100 caracteres",
+  "code": "VALIDATION_ERROR",
+  "details": [{ "field": "title", "message": "El título no puede superar los 100 caracteres" }],
+  "timestamp": "2026-11-26T18:00:00.000Z"
+}
+```
+
+| Status | `code` | Cuándo |
+|--------|--------|--------|
+| 400 | `VALIDATION_ERROR` | Datos inválidos (`details` indica el campo) |
+| 400 | `INVALID_JSON` / `INVALID_REFERENCE` | JSON mal formado / imagen inexistente |
+| 401 | `AUTH_REQUIRED`, `TOKEN_EXPIRED`, `INVALID_TOKEN`, `INVALID_CREDENTIALS` | Sesión o login |
+| 404 | `NOT_FOUND` / `ROUTE_NOT_FOUND` | Recurso o ruta inexistente |
+| 409 | `CONFLICT` | Datos duplicados |
+| 413 | `PAYLOAD_TOO_LARGE` | Cuerpo mayor a 1 MB |
+| 429 | `TOO_MANY_REQUESTS` | Demasiados intentos (login o comentarios) |
+| 503 | `SERVICE_UNAVAILABLE` | Base de datos no disponible |
+| 500 | `INTERNAL_ERROR` | Error inesperado (el detalle queda solo en el log) |
+
 ## Setup local
 
 ### Requisitos
-- Node.js 18+
+- Node.js 20+ (ver `.nvmrc`)
 - PostgreSQL (remoto o local)
 
 ### Backend
 
 ```bash
 cd backend
-npm install
-npx prisma generate
+npm install   # ejecuta prisma generate automáticamente (postinstall)
 ```
 
 Crear `backend/.env`:
@@ -104,11 +130,17 @@ JWT_SECRET="un-secret-largo-y-seguro"
 PORT=3000
 ADMIN_USER="tu_usuario"
 ADMIN_PASSWORD="hash_bcrypt_del_password"
+CORS_ORIGINS="http://localhost:5173"
 ```
+
+Hay un ejemplo en `backend/.env.example`. El servidor valida estas variables al
+arrancar y falla con un mensaje claro si falta alguna. `CORS_ORIGINS` acepta
+varios orígenes separados por coma (en producción, la URL del frontend).
 
 Iniciar:
 ```bash
-node server.js
+npm run dev     # desarrollo, con recarga automática
+npm start       # producción
 ```
 
 ### Frontend
@@ -121,14 +153,44 @@ npm install
 Crear `frontend/.env`:
 ```
 VITE_API_URL=http://localhost:3000
+VITE_SITE_URL=http://localhost:5173
 VITE_CLOUDINARY_CLOUD_NAME=tu_cloud_name
 VITE_CLOUDINARY_UPLOAD_PRESET=tu_upload_preset
 ```
 
+`VITE_API_URL` y `VITE_SITE_URL` son obligatorias: `npm run dev` y `npm run build`
+fallan con un mensaje claro si falta alguna. `VITE_SITE_URL` es la URL pública
+del frontend, sin barra final (en producción, la de Vercel).
+
 Iniciar:
 ```bash
 npm run dev
+npm test        # tests unitarios (vitest)
 ```
+
+## Open Graph (vista previa al compartir links)
+
+WhatsApp, LinkedIn, X, Facebook, Telegram y Discord no ejecutan JavaScript, así
+que solo leen las etiquetas del HTML inicial:
+
+- **Etiquetas por defecto** en `frontend/index.html`, entre los marcadores
+  `<!-- open-graph:start -->` y `<!-- open-graph:end -->` (no borrarlos). Imagen:
+  `frontend/public/og-default.png` (1200×630).
+- **Tarjeta por post**: `frontend/middleware.js` (Routing Middleware de Vercel)
+  atiende `/post/:id`. Si el User-Agent es un crawler de vista previa, pide el
+  post a la API y reemplaza el bloque con título, resumen (160 caracteres),
+  primera imagen del post y URL. Los visitantes reciben la SPA sin cambios.
+- Si la API no responde en 2,5 s (por ejemplo, Render despertando) o el post no
+  existe, se usan las etiquetas por defecto.
+- La lógica está en `frontend/seo/openGraph.js`, con tests en `frontend/tests/`.
+
+En Vercel deben existir `VITE_API_URL` y `VITE_SITE_URL`: el build las usa y el
+middleware las lee en tiempo de ejecución.
+
+Para probar en producción: [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/),
+[LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/) o
+`curl -A "WhatsApp/2.23" https://<sitio>/post/<id>`. Las redes guardan la
+tarjeta en caché: después de editar un post, usá el debugger para refrescarla.
 
 ## Seguridad
 

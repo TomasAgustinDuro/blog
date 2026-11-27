@@ -1,3 +1,4 @@
+import { badRequest, notFound } from "../lib/httpError.js";
 import * as commentRepository from "../repositories/commentRepository.js";
 
 const mapCommentToResponse = (comment) => ({
@@ -17,53 +18,25 @@ export const getAllComments = async (page, limit) => {
 }
 
 export const getSpecificComment = async (id) => {
-    if (!id) {
-        const error = new Error("ID not found");
-        error.status = 404;
-        throw error;
-    }
+    if (!id) throw badRequest("Falta el id del comentario");
 
     const comment = await commentRepository.getSpecificComment(id)
+    if (!comment) throw notFound("El comentario no existe");
 
-    if (!comment) {
-        const error = new Error("comment not found");
-        error.status = 404;
-        throw error;
-    }
     return { comment: mapCommentToResponse(comment) };
 }
 
+// Post inexistente al comentar: Prisma lanza P2003 y errorHandler responde 404
 export const insertComment = async (data) => {
-    if (!data) {
-        const error = new Error("Data not found");
-        error.status = 404;
-        throw error;
-    }
+    if (!data) throw badRequest("Faltan los datos del comentario");
 
     const comment = await commentRepository.insertComment(data)
-
-    if (!comment) {
-        const error = new Error("Something was wrong");
-        error.status = 404;
-        throw error;
-    }
     return { comment: mapCommentToResponse(comment) };
-
 }
 
 export const deleteComment = async (id) => {
-    if (!id) {
-        const error = new Error("ID not found");
-        error.status = 404;
-        throw error;
-    }
+    if (!id) throw badRequest("Falta el id del comentario");
 
     const comment = await commentRepository.deleteComment(id)
-
-    if (!comment) {
-        const error = new Error("Something was wrong");
-        error.status = 404;
-        throw error;
-    }
     return { comment: mapCommentToResponse(comment) };
 }

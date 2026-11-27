@@ -1,18 +1,14 @@
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import { fetchClient } from "../api/fetchClient";
 
 const loginUser = async ({ user, password }) => {
-  try {
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
-      user,
-      password,
-    });
+  const loginResponse = await fetchClient("/login", {
+    method: "POST",
+    body: JSON.stringify({ user, password }),
+  });
 
-    localStorage.setItem("token", response.data.token);
-    return response.data;
-  } catch (error) {
-    throw new Error("Error al iniciar sesión: " + error.message);
-  }
+  localStorage.setItem("token", loginResponse.token);
+  return loginResponse;
 };
 
 export const useLoginUser = (fetchUser) => {

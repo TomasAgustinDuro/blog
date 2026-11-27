@@ -1,3 +1,4 @@
+import { badRequest, notFound } from "../lib/httpError.js";
 import * as postRepository from "../repositories/postRepository.js";
 
 const mapPostToResponse = (post) => ({
@@ -25,95 +26,42 @@ export const getAllPost = async (page, limit) => {
 }
 
 export const getSpecificPost = async (id) => {
-    if (!id) {
-        const error = new Error("ID not found");
-        error.status = 404;
-        throw error;
-    }
+    if (!id) throw badRequest("Falta el id del post");
 
-    const post = await postRepository.findByPk(Number(id))
+    const post = await postRepository.findByPk(id)
+    if (!post) throw notFound("El post no existe");
 
-    if (!post) {
-        const error = new Error("Post not found");
-        error.status = 404;
-        throw error;
-    }
     return { post: mapPostToResponse(post) };
 }
 
-export const getByTag = async (tag) => {
-    if (!tag) {
-        const error = new Error("Tag not found");
-        error.status = 404;
-        throw error;
-    }
+export const getByTag = async (tag, page = 1, limit = 10) => {
+    if (!tag) throw badRequest("Falta el nombre del tag");
 
-    const post = await postRepository.findByTag(tag)
+    const offset = (page - 1) * limit;
+    const posts = await postRepository.findByTag(tag, offset, limit)
 
-    if (!post) {
-        const error = new Error("Post not found");
-        error.status = 404;
-        throw error;
-    }
-    return { post: posts.map(mapPostToResponse) };
+    return { posts: posts.map(mapPostToResponse) };
 }
 
+// En update y delete, si el post no existe Prisma lanza P2025 (404 en errorHandler)
 export const createPost = async (data) => {
-    if (!data) {
-        const error = new Error("Data not found");
-        error.status = 404;
-        throw error;
-    }
+    if (!data) throw badRequest("Faltan los datos del post");
 
     const post = await postRepository.createPost(data)
-
-    if (!post) {
-        const error = new Error("Something was wrong");
-        error.status = 404;
-        throw error;
-    }
     return { post: mapPostToResponse(post) };
-
 }
 
 export const updatePost = async (id, data) => {
-    if (!id) {
-        const error = new Error("ID not found");
-        error.status = 404;
-        throw error;
-    }
-
-
-    if (!data) {
-        const error = new Error("Data not found");
-        error.status = 404;
-        throw error;
-    }
+    if (!id) throw badRequest("Falta el id del post");
+    if (!data) throw badRequest("Faltan los datos del post");
 
     const post = await postRepository.updatedPost(id, data)
-
-    if (!post) {
-        const error = new Error("Something was wrong");
-        error.status = 404;
-        throw error;
-    }
     return { post: mapPostToResponse(post) };
-
 }
 
 export const deletePost = async (id) => {
-    if (!id) {
-        const error = new Error("ID not found");
-        error.status = 404;
-        throw error;
-    }
+    if (!id) throw badRequest("Falta el id del post");
 
     const post = await postRepository.deletePost(id)
-
-    if (!post) {
-        const error = new Error("Something was wrong");
-        error.status = 404;
-        throw error;
-    }
     return { post: mapPostToResponse(post) };
 }

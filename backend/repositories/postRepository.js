@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client"
-
-const prisma = new PrismaClient()
+import { prisma } from "../lib/prisma.js"
 
 export const findAllPaginated = async (offset, limit) => {
     const posts = await prisma.posts.findMany({
@@ -113,9 +111,10 @@ export const updatedPost = async (id, data) => {
             }
         })
 
-        await tx.post_tags.deleteMany({ where: { post_id: id } })
+        // tags/images undefined = no se modifican; un array (aunque vacío) los reemplaza
+        if (data.tags !== undefined) {
+            await tx.post_tags.deleteMany({ where: { post_id: id } })
 
-        if (data.tags?.length > 0) {
             for (const tagName of data.tags) {
                 const tag = await tx.tags.upsert({
                     where: { name: tagName },
@@ -127,20 +126,16 @@ export const updatedPost = async (id, data) => {
                     data: { post_id: post.id, tag_id: tag.id }
                 })
             }
-
         }
 
-        await tx.post_images.deleteMany({ where: { post_id: id } })
+        if (data.images !== undefined) {
+            await tx.post_images.deleteMany({ where: { post_id: id } })
 
-        if (data.images?.length > 0) {
             for (const [index, image] of data.images.entries()) {
-
                 await tx.post_images.create({
                     data: { post_id: post.id, image_id: image.id, is_featured: index === 0, order: index }
                 })
-
             }
-
         }
 
         return await tx.posts.findUnique({

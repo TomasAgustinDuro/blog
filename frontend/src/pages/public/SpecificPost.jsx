@@ -1,15 +1,28 @@
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useParams } from "react-router";
 import { usePostById } from "../../api/blogApi";
 import Comments from "../../components/InsertComments";
 import styles from "./specificPost.module.css";
 import Spinner from "../../components/Spinner";
 import DOMPurify from "dompurify"
+import { SITE_NAME } from "../../../seo/openGraph";
 
 function SpecificPost() {
   const { id } = useParams();
 
   const { data, error, isLoading } = usePostById(id);
   const post = data?.post;
+
+  // Título de la pestaña; al salir del post se restaura el anterior
+  useEffect(() => {
+    if (!post?.title) return undefined;
+
+    const previousTitle = document.title;
+    document.title = `${post.title} | ${SITE_NAME}`;
+    return () => {
+      document.title = previousTitle;
+    };
+  }, [post?.title]);
 
   if (isLoading) return <Spinner />;
   if (error) return <p>Error al cargar el post.</p>;

@@ -4,10 +4,11 @@ import { useParams, useNavigate } from "react-router";
 import styles from "./editPost.module.css";
 import { Color } from "@tiptap/extension-color";
 import { Image } from "@tiptap/extension-image";
-import TextStyle from "@tiptap/extension-text-style";
+import { TextStyle } from "@tiptap/extension-text-style";
 import { EditorProvider } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { MenuBar } from "./CreatePostComponent/components/MenuBar";
+import { POST_TITLE_MAX_LENGTH, TAG_MAX_LENGTH } from "../../constants/validationLimits";
 
 const extensions = [
   Color.configure({ types: [TextStyle.name] }),
@@ -81,8 +82,12 @@ function EditPost() {
         type="text"
         placeholder="Title"
         value={title}
+        maxLength={POST_TITLE_MAX_LENGTH}
         onChange={(e) => setTitle(e.target.value)}
       />
+      <small>
+        {title.length}/{POST_TITLE_MAX_LENGTH} caracteres
+      </small>
 
       <EditorProvider
         extensions={extensions}
@@ -110,6 +115,7 @@ function EditPost() {
         type="text"
         placeholder="Add a tag"
         value={currentTag}
+        maxLength={TAG_MAX_LENGTH}
         onChange={(e) => setCurrentTag(e.target.value)}
       />
 
@@ -122,7 +128,7 @@ function EditPost() {
         </button>
       </div>
 
-      {isError && <div className={styles.error}>Error: {error.message}</div>}
+      {isError && <div className={styles.error} role="alert">{error.message}</div>}
       {isSuccess && <div className={styles.success}>Post updated successfully</div>}
     </form>
   );

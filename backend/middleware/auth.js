@@ -1,26 +1,25 @@
 import bcrypt from "bcryptjs";
-import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
+import { unauthorized } from "../lib/httpError.js";
 
-dotenv.config();
+const JWT_SECRET = env.JWT_SECRET;
+const ADMIN_USER = env.ADMIN_USER;
+const ADMIN_PASSWORD_HASH = env.ADMIN_PASSWORD;
 
-const JWT_SECRET = process.env.JWT_SECRET;
-const ADMIN_USER = process.env.ADMIN_USER;
-const admin_password = process.env.ADMIN_PASSWORD;
+// Mensaje único para no revelar si falló el usuario o la contraseña
+const INVALID_CREDENTIALS_MESSAGE = "Usuario o contraseña incorrectos";
 
 export class Login {
-  static async loginUser(req, res) {
-    const { user, password } = req.body;
+  static async loginUser(req, res, next) {
+    const { user, password } = req.validated.body;
 
     try {
-      if (user !== ADMIN_USER) {
-        return res.status(401).json({ message: "Usuario incorrecto" });
-      }
+      // Se compara siempre el hash para no filtrar por tiempos de respuesta
+      const isPasswordValid = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
 
-      const isPasswordValid = await bcrypt.compare(password, admin_password);
-
-      if (!isPasswordValid) {
-        return res.status(401).json({ message: "Contraseña incorrecta" });
+      if (user !== ADMIN_USER || !isPasswordValid) {
+        return next(unauthorized("INVALID_CREDENTIALS", INVALID_CREDENTIALS_MESSAGE));
       }
 
       const token = jwt.sign({ username: user }, JWT_SECRET, {
@@ -29,8 +28,7 @@ export class Login {
 
       res.json({ token });
     } catch (error) {
-      console.error("Error al hacer login:", error);
-      return res.status(500).json({ error: error.message });
+      next(error);
     }
   }
 }

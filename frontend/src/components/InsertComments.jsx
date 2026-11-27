@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { useInsertComment } from "../api/blogApi";
+import {
+  COMMENT_CONTENT_MAX_LENGTH,
+  COMMENT_NAME_MAX_LENGTH,
+} from "../constants/validationLimits";
 import styles from "./comments.module.css";
 
 function Comments({ postId }) {
@@ -11,6 +15,7 @@ function Comments({ postId }) {
     isPending,
     isSuccess,
     isError,
+    error,
   } = useInsertComment(postId);
 
   const handleSubmit = (e) => {
@@ -34,6 +39,7 @@ function Comments({ postId }) {
         type="text"
         placeholder="Your name"
         value={name}
+        maxLength={COMMENT_NAME_MAX_LENGTH}
         onChange={(e) => setName(e.target.value)}
         className={styles.input}
       />
@@ -42,14 +48,18 @@ function Comments({ postId }) {
         id="comment-content"
         placeholder="Write your comment..."
         value={content}
+        maxLength={COMMENT_CONTENT_MAX_LENGTH}
         onChange={(e) => setContent(e.target.value)}
         className={styles.textarea}
       />
+      <small>
+        {content.length}/{COMMENT_CONTENT_MAX_LENGTH} caracteres
+      </small>
       <button type="submit" disabled={isPending} className={styles.button}>
         {isPending ? "Submitting..." : "Send Comment"}
       </button>
 
-      {isError && <div role="alert">Error submitting comment</div>}
+      {isError && <div role="alert">{error.message}</div>}
       {isSuccess && <div role="status">Comment submitted successfully</div>}
     </form>
   );

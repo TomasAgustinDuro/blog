@@ -6,6 +6,13 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 export default [
   { ignores: ['dist'] },
   {
+    // Archivos que corren en Node (config, middleware de Vercel, tests)
+    files: ['vite.config.js', 'vitest.config.js', 'middleware.js', 'seo/**/*.js', 'tests/**/*.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
+  {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,

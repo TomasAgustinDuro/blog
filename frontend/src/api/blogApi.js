@@ -1,12 +1,26 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { fetchClient } from "./fetchClient";
+
+// Claves de caché: todas cuelgan de "post" para poder invalidarlas juntas,
+// y cada tipo de consulta tiene su propio segmento para no pisarse entre sí.
+const postKeys = {
+  all: ["post"],
+  list: () => ["post", "list"],
+  page: (page) => ["post", "page", page],
+  detail: (id) => ["post", "detail", String(id)],
+};
 
 // Obtain posts
 const fetchPosts = async () => fetchClient("/posts");
 
 export const usePosts = () => {
   return useQuery({
-    queryKey: ["post"],
+    queryKey: postKeys.list(),
     queryFn: fetchPosts,
     staleTime: 1000 * 60 * 5,
   });
@@ -16,9 +30,9 @@ const fetchPaginatedPosts = async (page = 1) => fetchClient(`/posts?page=${page}
 
 export const usePaginatedPosts = (page = 1) => {
   return useQuery({
-    queryKey: ["post", page],
+    queryKey: postKeys.page(page),
     queryFn: () => fetchPaginatedPosts(page),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 5,
   });
 };
@@ -48,7 +62,7 @@ const fetchPostById = async (id) => fetchClient(`/posts/${id}`);
 
 export const usePostById = (id) => {
   return useQuery({
-    queryKey: ["post", id],
+    queryKey: postKeys.detail(id),
     queryFn: () => fetchPostById(id),
   });
 };
@@ -63,7 +77,7 @@ export const useDeletePost = () => {
   return useMutation({
     mutationFn: deletePost,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["post"] });
+      queryClient.invalidateQueries({ queryKey: postKeys.all });
     },
   });
 };
@@ -78,7 +92,7 @@ export const useInsertComment = (postId) => {
   return useMutation({
     mutationFn: insertComment,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["post", Number(postId)] });
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) });
     },
   });
 };
@@ -93,7 +107,7 @@ export const useDeleteComment = () => {
   return useMutation({
     mutationFn: deleteComment,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["post"] });
+      queryClient.invalidateQueries({ queryKey: postKeys.all });
     },
   });
 };

@@ -4,11 +4,12 @@ import styles from "./insertPost.module.css";
 import { useNavigate } from "react-router";
 import { Color } from "@tiptap/extension-color"; // Añadido
 import { Image } from "@tiptap/extension-image";
-import TextStyle from "@tiptap/extension-text-style";
+import { TextStyle } from "@tiptap/extension-text-style";
 import { EditorProvider } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { MenuBar } from "./components/MenuBar";
-import { useImages } from "../../../context/ImagesContext";
+import { useImages } from "../../../context/useImages";
+import { POST_TITLE_MAX_LENGTH, TAG_MAX_LENGTH } from "../../../constants/validationLimits";
 
 const extensions = [
   Color.configure({ types: [TextStyle.name] }), // Eliminado ListItem.name
@@ -39,10 +40,10 @@ function CreatePostForm() {
   const [content, setContent] = useState("<p>¡Escribe aquí tu contenido!</p>");
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState("");
-  const { images, featuredImageId } = useImages();
+  const { images } = useImages();
   const navigate = useNavigate();
 
-  const { mutate, isLoading, isSuccess, isError, error } = useCreatePosts();
+  const { mutate, isPending, isSuccess, isError, error } = useCreatePosts();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -83,8 +84,12 @@ function CreatePostForm() {
         type="text"
         placeholder="Title"
         value={title}
+        maxLength={POST_TITLE_MAX_LENGTH}
         onChange={(e) => setTitle(e.target.value)}
       />
+      <small>
+        {title.length}/{POST_TITLE_MAX_LENGTH} caracteres
+      </small>
 
       <div>
         <EditorProvider
@@ -107,6 +112,7 @@ function CreatePostForm() {
           type="text"
           placeholder="Add a tag"
           value={currentTag}
+          maxLength={TAG_MAX_LENGTH}
           onChange={(e) => setCurrentTag(e.target.value)}
         />
         <button className={styles.secondaryButton} onClick={handleAddTag}>Add Tag</button>
@@ -118,14 +124,14 @@ function CreatePostForm() {
           </span>
         ))}
       </div>
-      <button type="submit" disabled={isLoading} className={styles.actionButton}>
-        {isLoading ? "Submitting..." : "Create Post"}
+      <button type="submit" disabled={isPending} className={styles.actionButton}>
+        {isPending ? "Submitting..." : "Create Post"}
       </button>
 
       {isSuccess && (
         <div className={styles.success}>{"Post creado exitosamente"}</div>
       )}
-      {isError && <div className={styles.error}>Error: {error.message}</div>}
+      {isError && <div className={styles.error} role="alert">{error.message}</div>}
     </form>
   );
 }
