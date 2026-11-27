@@ -153,14 +153,44 @@ npm install
 Crear `frontend/.env`:
 ```
 VITE_API_URL=http://localhost:3000
+VITE_SITE_URL=http://localhost:5173
 VITE_CLOUDINARY_CLOUD_NAME=tu_cloud_name
 VITE_CLOUDINARY_UPLOAD_PRESET=tu_upload_preset
 ```
 
+`VITE_API_URL` y `VITE_SITE_URL` son obligatorias: `npm run dev` y `npm run build`
+fallan con un mensaje claro si falta alguna. `VITE_SITE_URL` es la URL pública
+del frontend, sin barra final (en producción, la de Vercel).
+
 Iniciar:
 ```bash
 npm run dev
+npm test        # tests unitarios (vitest)
 ```
+
+## Open Graph (vista previa al compartir links)
+
+WhatsApp, LinkedIn, X, Facebook, Telegram y Discord no ejecutan JavaScript, así
+que solo leen las etiquetas del HTML inicial:
+
+- **Etiquetas por defecto** en `frontend/index.html`, entre los marcadores
+  `<!-- open-graph:start -->` y `<!-- open-graph:end -->` (no borrarlos). Imagen:
+  `frontend/public/og-default.png` (1200×630).
+- **Tarjeta por post**: `frontend/middleware.js` (Routing Middleware de Vercel)
+  atiende `/post/:id`. Si el User-Agent es un crawler de vista previa, pide el
+  post a la API y reemplaza el bloque con título, resumen (160 caracteres),
+  primera imagen del post y URL. Los visitantes reciben la SPA sin cambios.
+- Si la API no responde en 2,5 s (por ejemplo, Render despertando) o el post no
+  existe, se usan las etiquetas por defecto.
+- La lógica está en `frontend/seo/openGraph.js`, con tests en `frontend/tests/`.
+
+En Vercel deben existir `VITE_API_URL` y `VITE_SITE_URL`: el build las usa y el
+middleware las lee en tiempo de ejecución.
+
+Para probar en producción: [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/),
+[LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/) o
+`curl -A "WhatsApp/2.23" https://<sitio>/post/<id>`. Las redes guardan la
+tarjeta en caché: después de editar un post, usá el debugger para refrescarla.
 
 ## Seguridad
 
